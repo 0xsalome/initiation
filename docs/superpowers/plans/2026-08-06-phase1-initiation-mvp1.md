@@ -1381,7 +1381,7 @@ git commit -m "feat: daily checkin"
 - Consumes: Task 2 `ApplicationRepository` / `DuplicateApplicationError`、Task 3 `requireMember`、Task 7 `isInitiationComplete`
 - Produces: Server Action `submitApplication(): Promise<{ ok: boolean; error?: string }>`、`/apply` ページ(申請状態の表示 + 申請ボタン)
 
-- [ ] **Step 1: 失敗するテストを書く**
+- [x] **Step 1: 失敗するテストを書く**
 
 `tests/unit/apply/actions.test.ts`:
 
@@ -1443,7 +1443,7 @@ describe("submitApplication", () => {
 
 Run: `mise exec -- npm test` → Expected: FAIL
 
-- [ ] **Step 2: 実装してテストを通す**
+- [x] **Step 2: 実装してテストを通す**
 
 `app/apply/actions.ts`:
 
@@ -1476,7 +1476,7 @@ export async function submitApplication(): Promise<{ ok: boolean; error?: string
 
 Run: `mise exec -- npm test` → Expected: PASS
 
-- [ ] **Step 3: ページを実装する**
+- [x] **Step 3: ページを実装する**
 
 `app/apply/page.tsx`:
 
@@ -1556,7 +1556,7 @@ export function ApplyForm() {
 }
 ```
 
-- [ ] **Step 4: 手動検証とコミット**
+- [x] **Step 4: 手動検証とコミット**
 
 完走前に `/apply` → 申請するとエラー。完走後 → 申請成功、状態「審査待ち」表示。再申請 → 「すでに申請済み」。
 
