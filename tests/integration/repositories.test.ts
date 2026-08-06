@@ -62,6 +62,7 @@ describe("repositories (local supabase)", () => {
       field: "distribution",
       toStatus: "sent",
       actorAddress: ADMIN,
+      reason: "Safeで送付完了を確認",
       txId: "0xdeadbeef",
     });
     const listed = await applications.listAll();
@@ -73,6 +74,7 @@ describe("repositories (local supabase)", () => {
       field: "distribution",
       to_status: "sent",
       actor_address: ADMIN,
+      reason: "Safeで送付完了を確認",
       tx_id: "0xdeadbeef",
     });
   });

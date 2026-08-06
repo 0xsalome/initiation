@@ -108,6 +108,48 @@ describe("transitionApplication", () => {
     expect(transitionMock).not.toHaveBeenCalled();
   });
 
+  it("passes a valid allowlist transition with the admin actor", async () => {
+    listAllMock.mockResolvedValue([application({ reviewStatus: "approved" })]);
+
+    const result = await transitionApplication({
+      applicationId: "a1",
+      field: "allowlist",
+      toStatus: "added",
+      reason: "コントラクト側で追加を確認",
+    });
+
+    expect(result).toEqual({ ok: true });
+    expect(transitionMock).toHaveBeenCalledWith({
+      applicationId: "a1",
+      field: "allowlist",
+      toStatus: "added",
+      actorAddress: ADMIN_ADDR,
+      reason: "コントラクト側で追加を確認",
+      txId: undefined,
+    });
+  });
+
+  it("trims a distribution tx hash before recording it", async () => {
+    listAllMock.mockResolvedValue([application({ reviewStatus: "approved" })]);
+
+    const result = await transitionApplication({
+      applicationId: "a1",
+      field: "distribution",
+      toStatus: "sent",
+      txId: "  0xabc123  ",
+    });
+
+    expect(result).toEqual({ ok: true });
+    expect(transitionMock).toHaveBeenCalledWith({
+      applicationId: "a1",
+      field: "distribution",
+      toStatus: "sent",
+      actorAddress: ADMIN_ADDR,
+      reason: undefined,
+      txId: "0xabc123",
+    });
+  });
+
   it("returns an error for an unknown application id", async () => {
     listAllMock.mockResolvedValue([]);
 
