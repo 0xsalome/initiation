@@ -213,7 +213,7 @@ export type Repositories = {
 export function getRepositories(): Repositories; // Supabase 実装を返す唯一の入口
 ```
 
-- [ ] **Step 1: `normalizeAddress` の失敗するテストを書く**
+- [x] **Step 1: `normalizeAddress` の失敗するテストを書く**
 
 `lib/domain/__tests__/address.test.ts`:
 
@@ -237,7 +237,7 @@ describe("normalizeAddress", () => {
 
 Run: `mise exec -- npm test` → Expected: FAIL(モジュールなし)
 
-- [ ] **Step 2: `lib/domain/address.ts` と `lib/domain/types.ts` を実装してテストを通す**
+- [x] **Step 2: `lib/domain/address.ts` と `lib/domain/types.ts` を実装してテストを通す**
 
 ```ts
 // ABOUTME: ウォレットアドレスの正規化。保存・比較の前に必ずこれを通す。
@@ -254,7 +254,7 @@ export function normalizeAddress(address: string): Address {
 
 Run: `mise exec -- npm test` → Expected: PASS
 
-- [ ] **Step 3: Repository 統合テストを書く**
+- [x] **Step 3: Repository 統合テストを書く**
 
 `lib/repositories/testSupport.ts`:
 
@@ -364,7 +364,7 @@ describe("repositories (local supabase)", () => {
 Run: `mise exec -- npx supabase start && mise exec -- npm test`
 Expected: FAIL(`@/lib/repositories` が存在しない)
 
-- [ ] **Step 4: Supabase 実装を書く**
+- [x] **Step 4: Supabase 実装を書く**
 
 `lib/repositories/supabase.ts`(要点。行↔ドメイン型のマッピング関数を各テーブルに書く):
 
@@ -550,7 +550,7 @@ export function getRepositories(): Repositories {
 
 `@supabase/supabase-js` を dependencies に移す: `mise exec -- npm install @supabase/supabase-js`
 
-- [ ] **Step 5: 統合テストが通ることを確認する**
+- [x] **Step 5: 統合テストが通ることを確認する**
 
 Run: `mise exec -- npx supabase status`(service role key を `.env.local` / テスト環境変数に設定)→ `mise exec -- npm test`
 Expected: PASS(address 3 + repositories 6 + フェーズ0からの既存テスト)
