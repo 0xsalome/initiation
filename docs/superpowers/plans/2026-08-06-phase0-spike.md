@@ -762,11 +762,11 @@ git commit -m "feat: Polygon switch and HENKAKU token watchAsset (shiniri equiva
 - Consumes: `.env.local` の `SAKURA_AI_API_KEY` / `SAKURA_AI_BASE_URL`(要取得: さくらのクラウドでキー発行。ここは人の作業)
 - Produces: API 呼び出し可否・利用量取得可否の事実を `docs/decisions.md` に記録。フェーズ3計画の入力になる。
 
-- [ ] **Step 1: 公式ドキュメントでエンドポイント仕様を確認する**
+- [x] **Step 1: 公式ドキュメントでエンドポイント仕様を確認する**
 
 さくらの AI Engine のドキュメントで、(1) chat completions のエンドポイント URL と認証ヘッダ形式、(2) 利用量・残枠を取得する API の有無、(3) 無料枠/上限の単位(リクエスト数かトークン数か)を確認し、メモする。
 
-- [ ] **Step 2: スパイクスクリプトを書く**
+- [x] **Step 2: スパイクスクリプトを書く**
 
 `scripts/sakura-ai-spike.ts`(実行: `mise exec -- npx tsx scripts/sakura-ai-spike.ts`。`tsx` は devDependency に追加):
 
@@ -804,7 +804,7 @@ main();
 
 Step 1 で確認した実際のエンドポイント・モデル名に合わせて修正して実行する。
 
-- [ ] **Step 3: 検証項目を実行して記録する**
+- [x] **Step 3: 検証項目を実行して記録する**
 
 確認すること:
 - API キーで chat completions が成功するか(status 200、content が返る)
@@ -825,7 +825,7 @@ Step 1 で確認した実際のエンドポイント・モデル名に合わせ�
 - フェーズ3への引き継ぎ: (未決定として残る点)
 ```
 
-- [ ] **Step 4: コミット**
+- [x] **Step 4: コミット**
 
 ```bash
 git add scripts/sakura-ai-spike.ts docs/decisions.md package.json package-lock.json
