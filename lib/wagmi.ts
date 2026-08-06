@@ -8,4 +8,6 @@ export const wagmiConfig = createConfig({
   chains: [polygon],
   connectors: [injected()],
   transports: { [polygon.id]: http() },
+  // Persisted wallet state is restored after SSR hydration to keep the first HTML identical.
+  ssr: true,
 });

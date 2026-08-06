@@ -3,7 +3,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { normalizeAddress } from "@/lib/domain/address";
 import { DuplicateApplicationError, getRepositories } from "@/lib/repositories";
-import { testClient, truncateAll } from "@/lib/repositories/testSupport";
+import { testClient, truncateAll } from "@/tests/support/repositories";
 
 const ADDR = normalizeAddress("0x1111111111111111111111111111111111111111");
 const ADMIN = normalizeAddress("0x2222222222222222222222222222222222222222");

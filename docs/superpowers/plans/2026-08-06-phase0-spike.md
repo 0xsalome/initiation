@@ -34,7 +34,7 @@
 - Create: `vitest.config.ts`
 - Create: `.env.example`
 - Create: `AGENTS.md`
-- Test: `lib/__tests__/smoke.test.ts`
+- Test: `tests/unit/lib/smoke.test.ts`
 
 **Interfaces:**
 - Consumes: なし(初回タスク)
@@ -66,7 +66,7 @@ import path from "node:path";
 export default defineConfig({
   test: {
     environment: "node",
-    include: ["**/__tests__/**/*.test.ts"],
+    include: ["tests/**/*.test.ts"],
   },
   resolve: {
     alias: { "@": path.resolve(__dirname) },
@@ -78,7 +78,7 @@ export default defineConfig({
 
 - [x] **Step 3: スモークテストを書き、実行して通ることを確認する**
 
-`lib/__tests__/smoke.test.ts`:
+`tests/unit/lib/smoke.test.ts`:
 
 ```ts
 import { describe, it, expect } from "vitest";
@@ -256,7 +256,7 @@ git commit -m "feat: wallet connection with wagmi v2 injected connector"
 - Create: `app/api/auth/me/route.ts`
 - Create: `components/SignInWithEthereum.tsx`
 - Modify: `app/page.tsx`
-- Test: `lib/__tests__/siwe.test.ts`
+- Test: `tests/unit/lib/siwe.test.ts`
 
 **Interfaces:**
 - Consumes: Task 2 の `wagmiConfig`、`useAccount` / `useSignMessage`
@@ -275,7 +275,7 @@ mise exec -- npm install siwe iron-session
 
 viem でテスト用秘密鍵から実署名を作り、本物の署名検証を通す。
 
-`lib/__tests__/siwe.test.ts`:
+`tests/unit/lib/siwe.test.ts`:
 
 ```ts
 import { describe, it, expect } from "vitest";
@@ -603,7 +603,7 @@ git commit -m "feat: SIWE authentication with iron-session"
 - Create: `lib/henkakuToken.ts`
 - Create: `components/WalletSetup.tsx`
 - Modify: `app/page.tsx`
-- Test: `lib/__tests__/henkakuToken.test.ts`
+- Test: `tests/unit/lib/henkakuToken.test.ts`
 
 **Interfaces:**
 - Consumes: Task 2 の `wagmiConfig`、`useSwitchChain` / `useWatchAsset`(wagmi v2)
@@ -611,7 +611,7 @@ git commit -m "feat: SIWE authentication with iron-session"
 
 - [x] **Step 1: トークン設定の失敗するテストを書く**
 
-`lib/__tests__/henkakuToken.test.ts`:
+`tests/unit/lib/henkakuToken.test.ts`:
 
 ```ts
 import { describe, it, expect, beforeEach } from "vitest";

@@ -128,9 +128,9 @@ git commit -m "feat: core tables migration (members, progress, applications, eve
 - Create: `lib/domain/address.ts`
 - Create: `lib/repositories/index.ts`
 - Create: `lib/repositories/supabase.ts`
-- Create: `lib/repositories/testSupport.ts`
-- Test: `lib/domain/__tests__/address.test.ts`
-- Test: `lib/repositories/__tests__/repositories.test.ts`
+- Create: `tests/support/repositories.ts`
+- Test: `tests/unit/lib/domain/address.test.ts`
+- Test: `tests/integration/repositories.test.ts`
 
 **Interfaces:**
 - Consumes: Task 1 のテーブル、`SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY`
@@ -215,7 +215,7 @@ export function getRepositories(): Repositories; // Supabase 実装を返す唯�
 
 - [x] **Step 1: `normalizeAddress` の失敗するテストを書く**
 
-`lib/domain/__tests__/address.test.ts`:
+`tests/unit/lib/domain/address.test.ts`:
 
 ```ts
 import { describe, it, expect } from "vitest";
@@ -256,7 +256,7 @@ Run: `mise exec -- npm test` → Expected: PASS
 
 - [x] **Step 3: Repository 統合テストを書く**
 
-`lib/repositories/testSupport.ts`:
+`tests/support/repositories.ts`:
 
 ```ts
 // ABOUTME: Repository 統合テスト用のローカル Supabase 接続とテーブル初期化。
@@ -278,12 +278,12 @@ export async function truncateAll() {
 }
 ```
 
-`lib/repositories/__tests__/repositories.test.ts`:
+`tests/integration/repositories.test.ts`:
 
 ```ts
 import { describe, it, expect, beforeEach } from "vitest";
 import { getRepositories, DuplicateApplicationError } from "@/lib/repositories";
-import { truncateAll } from "@/lib/repositories/testSupport";
+import { truncateAll } from "@/tests/support/repositories";
 import { normalizeAddress } from "@/lib/domain/address";
 
 const ADDR = normalizeAddress("0x1111111111111111111111111111111111111111");
@@ -343,7 +343,7 @@ describe("repositories (local supabase)", () => {
     expect(listed[0].distributionStatus).toBe("sent");
     expect(listed[0].distributionTxId).toBe("0xdeadbeef");
     // イベントは testClient で直接確認
-    const { testClient } = await import("@/lib/repositories/testSupport");
+    const { testClient } = await import("@/tests/support/repositories");
     const { data } = await testClient().from("application_events").select("*").eq("application_id", app.id);
     expect(data).toHaveLength(1);
     expect(data![0]).toMatchObject({ field: "distribution", to_status: "sent", actor_address: ADMIN, tx_id: "0xdeadbeef" });
@@ -571,7 +571,7 @@ git commit -m "feat: domain types and Supabase repository layer"
 - Create: `lib/auth/guards.ts`
 - Modify: `app/api/auth/verify/route.ts`(フェーズ0実装に member upsert を追加)
 - Modify: `.env.example`(`ADMIN_ADDRESSES` を追加)
-- Test: `lib/auth/__tests__/admin.test.ts`
+- Test: `tests/unit/lib/auth/admin.test.ts`
 
 **Interfaces:**
 - Consumes: フェーズ0の `getSession()` / `verifySiweMessage()`、Task 2 の `getRepositories()` / `normalizeAddress()`
@@ -584,7 +584,7 @@ git commit -m "feat: domain types and Supabase repository layer"
 
 - [x] **Step 1: `isAdminAddress` の失敗するテストを書く**
 
-`lib/auth/__tests__/admin.test.ts`:
+`tests/unit/lib/auth/admin.test.ts`:
 
 ```ts
 import { describe, it, expect, beforeEach } from "vitest";
@@ -694,7 +694,7 @@ git commit -m "feat: bind SIWE session to members and add admin guard"
 
 **Files:**
 - Create: `lib/domain/applicationTransitions.ts`
-- Test: `lib/domain/__tests__/applicationTransitions.test.ts`
+- Test: `tests/unit/lib/domain/applicationTransitions.test.ts`
 
 **Interfaces:**
 - Consumes: Task 2 の型(`ReviewStatus` など)
@@ -707,7 +707,7 @@ git commit -m "feat: bind SIWE session to members and add admin guard"
 
 - [x] **Step 1: 失敗するテストを書く**
 
-`lib/domain/__tests__/applicationTransitions.test.ts`:
+`tests/unit/lib/domain/applicationTransitions.test.ts`:
 
 ```ts
 import { describe, it, expect } from "vitest";
@@ -807,7 +807,7 @@ Run: `mise exec -- npm test` → Expected: PASS
 - [x] **Step 3: コミット**
 
 ```bash
-git add lib/domain/applicationTransitions.ts lib/domain/__tests__/applicationTransitions.test.ts
+git add lib/domain/applicationTransitions.ts tests/unit/lib/domain/applicationTransitions.test.ts
 git commit -m "feat: application status transition rules"
 ```
 
@@ -878,7 +878,7 @@ git commit -m "feat: wallet setup flow page"
 
 **Files:**
 - Create: `lib/initiation/content.ts`
-- Test: `lib/initiation/__tests__/content.test.ts`
+- Test: `tests/unit/lib/initiation/content.test.ts`
 
 **Interfaces:**
 - Consumes: なし(データ定義)
@@ -896,7 +896,7 @@ Task 7 の画面と進捗保存が `initiationSteps` を唯一のコンテンツ
 
 - [x] **Step 1: 失敗するテストを書く**
 
-`lib/initiation/__tests__/content.test.ts`:
+`tests/unit/lib/initiation/content.test.ts`:
 
 ```ts
 import { describe, it, expect } from "vitest";
@@ -980,21 +980,22 @@ git commit -m "feat: initiation steps content (placeholder copy, structure final
 **Files:**
 - Create: `app/initiation/page.tsx`
 - Create: `app/initiation/actions.ts`
+- Create: `lib/initiation/complete.ts`
 - Create: `components/InitiationSteps.tsx`
-- Test: `app/initiation/__tests__/actions.test.ts`
+- Test: `tests/unit/app/initiation/actions.test.ts`
 
 **Interfaces:**
 - Consumes: Task 2 `ProgressRepository`、Task 3 `requireMember`、Task 6 `initiationSteps` / `findStep`
 - Produces:
   - Server Action `saveStep(stepId: string, answer: string | null): Promise<{ ok: boolean; error?: string }>`
   - `/initiation` ページ: 全ステップと完了状態を表示し、質問には回答フォーム、クエストには完了ボタンを出す
-  - `isInitiationComplete(entries: ProgressEntry[]): boolean`(`app/initiation/actions.ts` から export。Task 8 の申請フォームが完走判定に使う)
+  - `isInitiationComplete(entries: ProgressEntry[]): boolean`(`lib/initiation/complete.ts` から export。Task 8 の申請フォームが完走判定に使う)
 
-- [ ] **Step 1: アクションの失敗するテストを書く**
+- [x] **Step 1: アクションの失敗するテストを書く**
 
 Repository と guard をモックし、アクションの入力検証と委譲を確認する。
 
-`app/initiation/__tests__/actions.test.ts`:
+`tests/unit/app/initiation/actions.test.ts`:
 
 ```ts
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -1050,7 +1051,7 @@ describe("isInitiationComplete", () => {
 
 Run: `mise exec -- npm test` → Expected: FAIL
 
-- [ ] **Step 2: アクションを実装してテストを通す**
+- [x] **Step 2: アクションを実装してテストを通す**
 
 `app/initiation/actions.ts`:
 
@@ -1091,7 +1092,7 @@ export function isInitiationComplete(entries: ProgressEntry[]): boolean {
 
 Run: `mise exec -- npm test` → Expected: PASS
 
-- [ ] **Step 3: ページとコンポーネントを実装する**
+- [x] **Step 3: ページとコンポーネントを実装する**
 
 `app/initiation/page.tsx`(Server Component):
 
@@ -1197,14 +1198,14 @@ function StepItem({ step, entry }: { step: InitiationStep; entry?: ProgressEntry
 }
 ```
 
-- [ ] **Step 4: 手動検証**
+- [x] **Step 4: 手動検証**
 
 - サインイン済みで `/initiation` → ステップが並ぶ
 - 質問に回答して保存 → リロードしても ✅ と回答が残る(進捗保存)
 - 全ステップ完了 → 申請への導線が出る
 - 未サインインで `/initiation` → セットアップへの案内が出る
 
-- [ ] **Step 5: コミット**
+- [x] **Step 5: コミット**
 
 ```bash
 git add -A
@@ -1218,7 +1219,7 @@ git commit -m "feat: initiation steps screen with progress persistence"
 **Files:**
 - Create: `app/checkin/page.tsx`
 - Create: `app/checkin/actions.ts`
-- Test: `app/checkin/__tests__/actions.test.ts`
+- Test: `tests/unit/app/checkin/actions.test.ts`
 
 **Interfaces:**
 - Consumes: Task 2 `CheckinRepository`、Task 3 `requireMember`
@@ -1226,7 +1227,7 @@ git commit -m "feat: initiation steps screen with progress persistence"
 
 - [ ] **Step 1: 失敗するテストを書く**
 
-`app/checkin/__tests__/actions.test.ts`:
+`tests/unit/app/checkin/actions.test.ts`:
 
 ```ts
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -1374,7 +1375,7 @@ git commit -m "feat: daily checkin"
 - Create: `app/apply/page.tsx`
 - Create: `app/apply/actions.ts`
 - Create: `components/ApplyForm.tsx`
-- Test: `app/apply/__tests__/actions.test.ts`
+- Test: `tests/unit/apply/actions.test.ts`
 
 **Interfaces:**
 - Consumes: Task 2 `ApplicationRepository` / `DuplicateApplicationError`、Task 3 `requireMember`、Task 7 `isInitiationComplete`
@@ -1382,7 +1383,7 @@ git commit -m "feat: daily checkin"
 
 - [ ] **Step 1: 失敗するテストを書く**
 
-`app/apply/__tests__/actions.test.ts`:
+`tests/unit/apply/actions.test.ts`:
 
 ```ts
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -1572,7 +1573,7 @@ git commit -m "feat: allowlist and token distribution application form"
 - Create: `app/admin/page.tsx`
 - Create: `app/admin/actions.ts`
 - Create: `components/AdminApplicationRow.tsx`
-- Test: `app/admin/__tests__/actions.test.ts`
+- Test: `tests/unit/app/admin/actions.test.ts`
 
 **Interfaces:**
 - Consumes: Task 2 `ApplicationRepository`、Task 3 `requireAdmin` / `ForbiddenError`、Task 4 `validateTransition`
@@ -1580,7 +1581,7 @@ git commit -m "feat: allowlist and token distribution application form"
 
 - [ ] **Step 1: 失敗するテストを書く**
 
-`app/admin/__tests__/actions.test.ts`:
+`tests/unit/app/admin/actions.test.ts`:
 
 ```ts
 import { describe, it, expect, vi, beforeEach } from "vitest";
