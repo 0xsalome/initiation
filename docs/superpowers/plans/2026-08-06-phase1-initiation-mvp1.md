@@ -38,7 +38,7 @@
 - Consumes: フェーズ0 Task 6 の Supabase セットアップ(`supabase/` ディレクトリ)
 - Produces: `members` / `initiation_progress` / `applications` / `application_events` / `checkins` テーブル。Task 2 の Repository が読み書きする。
 
-- [ ] **Step 1: migration SQL を書く**
+- [x] **Step 1: migration SQL を書く**
 
 `supabase/migrations/20260806000001_core_tables.sql`:
 
@@ -103,7 +103,7 @@ create table checkins (
 );
 ```
 
-- [ ] **Step 2: migration が適用できることを確認する**
+- [x] **Step 2: migration が適用できることを確認する**
 
 ```bash
 mise exec -- npx supabase start
@@ -112,7 +112,7 @@ mise exec -- npx supabase db reset
 
 Expected: エラーなく全 migration が適用される。`npx supabase db reset` の出力で 5 テーブルの作成を確認。
 
-- [ ] **Step 3: コミット**
+- [x] **Step 3: コミット**
 
 ```bash
 git add supabase/
