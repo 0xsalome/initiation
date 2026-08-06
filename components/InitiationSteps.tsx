@@ -3,6 +3,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import type { ProgressEntry } from "@/lib/domain/types";
 import type { InitiationStep } from "@/lib/initiation/content";
 import { saveStep } from "@/app/initiation/actions";
@@ -32,6 +33,7 @@ function StepItem({ step, entry }: { step: InitiationStep; entry?: ProgressEntry
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(Boolean(entry));
   const [pending, startTransition] = useTransition();
+  const router = useRouter();
 
   function submit(value: string | null) {
     setError(null);
@@ -39,6 +41,7 @@ function StepItem({ step, entry }: { step: InitiationStep; entry?: ProgressEntry
       const result = await saveStep(step.id, value);
       if (result.ok) {
         setSaved(true);
+        router.refresh();
       } else {
         setError(result.error ?? "保存できませんでした");
       }
