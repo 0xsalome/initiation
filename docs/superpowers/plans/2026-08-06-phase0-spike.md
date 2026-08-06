@@ -265,13 +265,13 @@ git commit -m "feat: wallet connection with wagmi v2 injected connector"
   - `lib/siwe.ts`: `verifySiweMessage(params: { message: string; signature: \`0x${string}\`; expectedNonce: string; expectedDomain: string; expectedChainId: number }): Promise<{ ok: true; address: \`0x${string}\` } | { ok: false; reason: string }>`
   - API: `GET /api/auth/nonce` → `{ nonce }` / `POST /api/auth/verify` → 200 or 401 / `POST /api/auth/logout` / `GET /api/auth/me` → `{ address }` or 401
 
-- [ ] **Step 1: 依存を追加する**
+- [x] **Step 1: 依存を追加する**
 
 ```bash
 mise exec -- npm install siwe iron-session
 ```
 
-- [ ] **Step 2: SIWE 検証ロジックの失敗するテストを書く**
+- [x] **Step 2: SIWE 検証ロジックの失敗するテストを書く**
 
 viem でテスト用秘密鍵から実署名を作り、本物の署名検証を通す。
 
@@ -361,12 +361,12 @@ describe("verifySiweMessage", () => {
 });
 ```
 
-- [ ] **Step 3: テストが失敗することを確認する**
+- [x] **Step 3: テストが失敗することを確認する**
 
 Run: `mise exec -- npm test`
 Expected: FAIL(`@/lib/siwe` が存在しない)
 
-- [ ] **Step 4: `lib/siwe.ts` を実装する**
+- [x] **Step 4: `lib/siwe.ts` を実装する**
 
 ```ts
 // ABOUTME: SIWE メッセージ検証。nonce / domain / chainId / 署名をサーバー側で確認する。
@@ -407,12 +407,12 @@ export async function verifySiweMessage(
 }
 ```
 
-- [ ] **Step 5: テストが通ることを確認する**
+- [x] **Step 5: テストが通ることを確認する**
 
 Run: `mise exec -- npm test`
 Expected: PASS(5 tests)
 
-- [ ] **Step 6: セッションと API ルートを実装する**
+- [x] **Step 6: セッションと API ルートを実装する**
 
 `lib/session.ts`:
 
@@ -515,7 +515,7 @@ export async function GET() {
 }
 ```
 
-- [ ] **Step 7: サインインコンポーネントを実装する**
+- [x] **Step 7: サインインコンポーネントを実装する**
 
 `components/SignInWithEthereum.tsx`:
 
@@ -581,14 +581,14 @@ export function SignInWithEthereum() {
 
 `app/page.tsx` に `<SignInWithEthereum />` を追加する。
 
-- [ ] **Step 8: 手動検証**
+- [x] **Step 8: 手動検証**
 
 - 接続 → 署名 → 「サインイン済み」表示、`GET /api/auth/me` が 200 を返す
 - 署名ダイアログで「拒否」→ エラー表示 → 再試行で復帰できる
 - MetaMask でアカウントを切り替える → サインイン状態が解除され `me` が 401 になる
 - チェーンを Polygon 以外に切り替える → 同様に解除される
 
-- [ ] **Step 9: コミット**
+- [x] **Step 9: コミット**
 
 ```bash
 git add -A
