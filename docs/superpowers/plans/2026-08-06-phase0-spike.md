@@ -150,13 +150,13 @@ git commit -m "chore: scaffold Next.js app with Vitest"
 - Consumes: Task 1 の scaffold
 - Produces: `lib/wagmi.ts` の `export const wagmiConfig`(chains: `[polygon]`、connector: `injected()`)。Task 3・4 のフックはこの config 上で動く。`<ConnectWallet />` は接続済みのとき `useAccount()` のアドレスを表示する。
 
-- [ ] **Step 1: 依存を追加する**
+- [x] **Step 1: 依存を追加する**
 
 ```bash
 mise exec -- npm install wagmi viem @tanstack/react-query
 ```
 
-- [ ] **Step 2: wagmi config と Provider を実装する**
+- [x] **Step 2: wagmi config と Provider を実装する**
 
 `lib/wagmi.ts`:
 
@@ -195,7 +195,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
 `app/layout.tsx` の `<body>` 直下を `<Providers>{children}</Providers>` で包む。
 
-- [ ] **Step 3: 接続コンポーネントを実装してページに置く**
+- [x] **Step 3: 接続コンポーネントを実装してページに置く**
 
 `components/ConnectWallet.tsx`:
 
@@ -230,13 +230,13 @@ export function ConnectWallet() {
 
 `app/page.tsx` を `<ConnectWallet />` を置くだけのページに置き換える。
 
-- [ ] **Step 4: 手動検証**
+- [x] **Step 4: 手動検証**
 
 `mise exec -- npm run dev` で確認:
 - MetaMask あり: 接続 → アドレス表示 → 切断が動く
 - MetaMask のダイアログで「拒否」→ エラーメッセージが出て、再度ボタンを押せば復帰できる
 
-- [ ] **Step 5: コミット**
+- [x] **Step 5: コミット**
 
 ```bash
 git add -A
