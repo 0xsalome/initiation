@@ -21,6 +21,7 @@
     "wagmi": "^3.7.6"
   },
   "devDependencies": {
+    "@supabase/supabase-js": "^2.112.1",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

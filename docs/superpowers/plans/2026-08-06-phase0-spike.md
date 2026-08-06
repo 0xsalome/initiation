@@ -845,7 +845,7 @@ git commit -m "spike: sakura AI Engine connectivity and usage observation"
 - Consumes: Task 5 で作った `docs/decisions.md`
 - Produces: DB 選定の決定(第一候補: Supabase)。フェーズ1計画の Task 1(スキーマ)・Task 2(Repository)の前提。
 
-- [ ] **Step 1: Supabase プロジェクトを作り、migration を1本流す**
+- [x] **Step 1: Supabase プロジェクトを作り、migration を1本流す**
 
 ```bash
 mise exec -- npx supabase init
@@ -866,7 +866,7 @@ create table spike_members (
 mise exec -- npx supabase db reset   # migration が適用されることを確認
 ```
 
-- [ ] **Step 2: 接続・同時更新スパイクを実行する**
+- [x] **Step 2: 接続・同時更新スパイクを実行する**
 
 `scripts/db-spike.ts`(`@supabase/supabase-js` を devDependency に追加):
 
@@ -893,7 +893,7 @@ main();
 Run: `mise exec -- npx tsx scripts/db-spike.ts`
 Expected: 片方は error(unique violation)、rows: 1
 
-- [ ] **Step 3: 比較表を書いて選定する**
+- [x] **Step 3: 比較表を書いて選定する**
 
 `docs/decisions.md` に追記。比較観点は開発計画どおり「接続 / migration / バックアップ・復旧 / 同時更新」:
 
@@ -912,7 +912,7 @@ Expected: 片方は error(unique violation)、rows: 1
 **VPS**: 常時稼働要件が出た時点で再評価(開発計画どおり)
 ```
 
-- [ ] **Step 4: コミット**
+- [x] **Step 4: コミット**
 
 ```bash
 git add -A
