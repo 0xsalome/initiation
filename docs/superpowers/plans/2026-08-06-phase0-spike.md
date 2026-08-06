@@ -930,7 +930,7 @@ git commit -m "spike: DB candidate comparison and selection"
 - Consumes: Task 1〜6 のすべて
 - Produces: フェーズ0完了の判定。フェーズ1着手の前提。
 
-- [ ] **Step 1: 通し確認**
+- [x] **Step 1: 通し確認**
 
 `mise exec -- npm run dev` で1ページ上で以下が通ることを確認する:
 
@@ -941,11 +941,11 @@ git commit -m "spike: DB candidate comparison and selection"
 
 加えて Task 5(AI 疎通)・Task 6(DB 選定)の記録が `docs/decisions.md` にあること。
 
-- [ ] **Step 2: 完了記録とフェーズ1への申し送りを書く**
+- [x] **Step 2: 完了記録とフェーズ1への申し送りを書く**
 
 `docs/decisions.md` に追記: フェーズ0完了日、プロトタイプから持ち越すもの(`lib/siwe.ts`・`lib/session.ts`・`lib/henkakuToken.ts` とそのテスト)、捨てるもの(スパイクスクリプト・spike migration)、フェーズ1計画の修正が必要な点(DB 選定が Supabase 以外になった場合など)。
 
-- [ ] **Step 3: コミット**
+- [x] **Step 3: コミット**
 
 ```bash
 git add docs/decisions.md
