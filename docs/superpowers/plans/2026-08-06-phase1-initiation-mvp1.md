@@ -582,7 +582,7 @@ git commit -m "feat: domain types and Supabase repository layer"
     - `requireAdmin(): Promise<{ member: Member; address: Address }>`(非管理者なら `throw new ForbiddenError()`)
     - `class UnauthenticatedError extends Error {}` / `class ForbiddenError extends Error {}`
 
-- [ ] **Step 1: `isAdminAddress` の失敗するテストを書く**
+- [x] **Step 1: `isAdminAddress` の失敗するテストを書く**
 
 `lib/auth/__tests__/admin.test.ts`:
 
@@ -615,7 +615,7 @@ describe("isAdminAddress", () => {
 
 Run: `mise exec -- npm test` → Expected: FAIL
 
-- [ ] **Step 2: 実装してテストを通す**
+- [x] **Step 2: 実装してテストを通す**
 
 `lib/auth/admin.ts`:
 
@@ -635,7 +635,7 @@ export function isAdminAddress(address: Address): boolean {
 
 Run: `mise exec -- npm test` → Expected: PASS
 
-- [ ] **Step 3: guards を実装する**
+- [x] **Step 3: guards を実装する**
 
 `lib/auth/guards.ts`:
 
@@ -664,7 +664,7 @@ export async function requireAdmin(): Promise<{ member: Member; address: Address
 }
 ```
 
-- [ ] **Step 4: verify ルートで member を upsert する**
+- [x] **Step 4: verify ルートで member を upsert する**
 
 `app/api/auth/verify/route.ts` の成功パス(`session.address = result.address;` の前)に追加:
 
@@ -679,7 +679,7 @@ session.address = address;
 
 `.env.example` に追記: `ADMIN_ADDRESSES=`(カンマ区切りで管理者ウォレットアドレス)
 
-- [ ] **Step 5: 手動検証とコミット**
+- [x] **Step 5: 手動検証とコミット**
 
 dev サーバーでサインイン → ローカル Supabase の `members` に小文字アドレスの行ができることを確認。
 

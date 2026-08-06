@@ -1,6 +1,8 @@
 // ABOUTME: クライアントから受け取った SIWE 署名を検証し、認証済みセッションを発行する。
 // ABOUTME: nonce は成功・失敗を問わず検証試行後に破棄して一回限りにする。
 import { polygon } from "wagmi/chains";
+import { normalizeAddress } from "@/lib/domain/address";
+import { getRepositories } from "@/lib/repositories";
 import { getSession } from "@/lib/session";
 import { verifySiweMessage } from "@/lib/siwe";
 
@@ -49,8 +51,10 @@ export async function POST(request: Request) {
     return Response.json({ error: result.reason }, { status: 401 });
   }
 
-  session.address = result.address;
+  const address = normalizeAddress(result.address);
+  await getRepositories().members.upsertByAddress(address);
+  session.address = address;
   session.chainId = polygon.id;
   await session.save();
-  return Response.json({ address: result.address });
+  return Response.json({ address });
 }
