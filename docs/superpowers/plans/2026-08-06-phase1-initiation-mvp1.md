@@ -1828,7 +1828,7 @@ git commit -m "feat: admin application list with audited status transitions"
 - Consumes: Task 9〜10 の申請・管理フロー
 - Produces: 承認者向け運用手順書(フェーズ1完了条件の成果物)
 
-- [ ] **Step 1: runbook を書く**
+- [x] **Step 1: runbook を書く**
 
 `docs/runbook-manual-operations.md` に以下の章立てで、実際の手順を書く(担当者名・鍵の保管場所は書かない。役割名のみ):
 
@@ -1864,7 +1864,7 @@ git commit -m "feat: admin application list with audited status transitions"
 
 「Allowlist へアドレスを追加する」の実手順と判断基準は人の決定が必要(オープンクエスチョン「最終確認する人と承認フローの具体」)。暫定運用を明記した上で、確定後に更新する。
 
-- [ ] **Step 2: コミット**
+- [x] **Step 2: コミット**
 
 ```bash
 git add docs/runbook-manual-operations.md
