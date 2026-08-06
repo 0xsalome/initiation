@@ -40,7 +40,7 @@
 - Consumes: なし(初回タスク)
 - Produces: `npm run dev` / `npm test` が動くリポジトリ。以降の全タスクの土台。
 
-- [ ] **Step 1: create-next-app でリポジトリ直下に scaffold する**
+- [x] **Step 1: create-next-app でリポジトリ直下に scaffold する**
 
 ```bash
 cd /Users/masumi/tmp/initiation
@@ -49,7 +49,7 @@ mise exec -- npx create-next-app@latest . --typescript --app --eslint --no-tailw
 
 既存の `docs/` はそのまま残す(create-next-app は非空ディレクトリで確認を求めた場合は上書きせず続行を選ぶ。失敗する場合は一時ディレクトリに生成してから `docs/` 以外を移動する)。
 
-- [ ] **Step 2: Vitest を導入する**
+- [x] **Step 2: Vitest を導入する**
 
 ```bash
 mise exec -- npm install -D vitest @vitest/coverage-v8
@@ -76,7 +76,7 @@ export default defineConfig({
 
 `package.json` の scripts に追加: `"test": "vitest run"`
 
-- [ ] **Step 3: スモークテストを書き、実行して通ることを確認する**
+- [x] **Step 3: スモークテストを書き、実行して通ることを確認する**
 
 `lib/__tests__/smoke.test.ts`:
 
@@ -93,7 +93,7 @@ describe("smoke", () => {
 Run: `mise exec -- npm test`
 Expected: PASS(1 test)
 
-- [ ] **Step 4: `.env.example` と `AGENTS.md` を作る**
+- [x] **Step 4: `.env.example` と `AGENTS.md` を作る**
 
 `.env.example`:
 
@@ -126,7 +126,7 @@ HENKAKU Initiation。docs/development-plan.md が全体計画、docs/superpowers
 - 決定事項は docs/decisions.md に記録
 ```
 
-- [ ] **Step 5: dev サーバーが起動することを確認してコミット**
+- [x] **Step 5: dev サーバーが起動することを確認してコミット**
 
 Run: `mise exec -- npm run dev` を起動し、`http://localhost:3000` が 200 を返すことを確認して停止。
 
