@@ -705,7 +705,7 @@ git commit -m "feat: bind SIWE session to members and add admin guard"
 - allowlist / distribution: review が `approved` のときだけ変更可。`pending → added|failed`(allowlist)、`pending → sent|failed`(distribution)、`failed → added|sent`(再試行)。`added`/`sent` は終端。
 - distribution を `sent` にするとき txId 必須(検証は Task 9 のアクション側で行う)。
 
-- [ ] **Step 1: 失敗するテストを書く**
+- [x] **Step 1: 失敗するテストを書く**
 
 `lib/domain/__tests__/applicationTransitions.test.ts`:
 
@@ -758,7 +758,7 @@ describe("validateTransition", () => {
 
 Run: `mise exec -- npm test` → Expected: FAIL
 
-- [ ] **Step 2: 実装してテストを通す**
+- [x] **Step 2: 実装してテストを通す**
 
 `lib/domain/applicationTransitions.ts`:
 
@@ -804,7 +804,7 @@ export function validateTransition(
 
 Run: `mise exec -- npm test` → Expected: PASS
 
-- [ ] **Step 3: コミット**
+- [x] **Step 3: コミット**
 
 ```bash
 git add lib/domain/applicationTransitions.ts lib/domain/__tests__/applicationTransitions.test.ts
