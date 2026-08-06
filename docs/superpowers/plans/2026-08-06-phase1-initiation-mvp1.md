@@ -894,7 +894,7 @@ export function findStep(stepId: string): InitiationStep | undefined;
 
 Task 7 の画面と進捗保存が `initiationSteps` を唯一のコンテンツソースとして使う。**本文は仮**であり、公開前にコミュニティ確定版へ書き換える(このファイルの編集のみで完結する)。
 
-- [ ] **Step 1: 失敗するテストを書く**
+- [x] **Step 1: 失敗するテストを書く**
 
 `lib/initiation/__tests__/content.test.ts`:
 
@@ -920,7 +920,7 @@ describe("initiation content", () => {
 
 Run: `mise exec -- npm test` → Expected: FAIL
 
-- [ ] **Step 2: 仮コンテンツで実装してテストを通す**
+- [x] **Step 2: 仮コンテンツで実装してテストを通す**
 
 `lib/initiation/content.ts`:
 
@@ -966,7 +966,7 @@ export function findStep(stepId: string) {
 
 Run: `mise exec -- npm test` → Expected: PASS
 
-- [ ] **Step 3: コミット**
+- [x] **Step 3: コミット**
 
 ```bash
 git add lib/initiation/
