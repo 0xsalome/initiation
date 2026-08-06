@@ -1579,7 +1579,7 @@ git commit -m "feat: allowlist and token distribution application form"
 - Consumes: Task 2 `ApplicationRepository`、Task 3 `requireAdmin` / `ForbiddenError`、Task 4 `validateTransition`
 - Produces: Server Action `transitionApplication(params: { applicationId: string; field: StatusField; toStatus: string; reason?: string; txId?: string }): Promise<{ ok: boolean; error?: string }>`、`/admin` ページ(申請一覧 + 操作ボタン)
 
-- [ ] **Step 1: 失敗するテストを書く**
+- [x] **Step 1: 失敗するテストを書く**
 
 `tests/unit/app/admin/actions.test.ts`:
 
@@ -1652,7 +1652,7 @@ describe("transitionApplication", () => {
 
 Run: `mise exec -- npm test` → Expected: FAIL
 
-- [ ] **Step 2: アクションを実装してテストを通す**
+- [x] **Step 2: アクションを実装してテストを通す**
 
 `app/admin/actions.ts`:
 
@@ -1702,7 +1702,7 @@ export async function transitionApplication(params: {
 
 Run: `mise exec -- npm test` → Expected: PASS
 
-- [ ] **Step 3: 管理ページを実装する**
+- [x] **Step 3: 管理ページを実装する**
 
 `app/admin/page.tsx`:
 
@@ -1803,14 +1803,14 @@ export function AdminApplicationRow({ application }: { application: ApplicationW
 }
 ```
 
-- [ ] **Step 4: 手動検証**
+- [x] **Step 4: 手動検証**
 
 - `ADMIN_ADDRESSES` に自分のアドレスを設定してサインイン → `/admin` に申請が並ぶ
 - 承認 → Allowlist/配布ボタンが出る → 配布は tx hash 未入力だとエラー
 - `ADMIN_ADDRESSES` から外したアドレスでサインイン → `/admin` は 404
 - 遷移のたびにローカル Supabase の `application_events` に行が増える(実行者アドレス入り)
 
-- [ ] **Step 5: コミット**
+- [x] **Step 5: コミット**
 
 ```bash
 git add -A
