@@ -824,7 +824,7 @@ git commit -m "feat: application status transition rules"
 - Consumes: フェーズ0 Task 2〜4 のコンポーネント
 - Produces: `/setup` ページ(接続 → SIWE → Polygon 切替 → トークン追加の順に並ぶ)。完了後 `/initiation` へのリンクを出す。
 
-- [ ] **Step 1: `/setup` ページを実装する**
+- [x] **Step 1: `/setup` ページを実装する**
 
 `app/setup/page.tsx`:
 
@@ -861,11 +861,11 @@ export default function SetupPage() {
 
 `app/page.tsx` はタイトルと `/setup` への導線だけのトップページにする。
 
-- [ ] **Step 2: 手動検証**
+- [x] **Step 2: 手動検証**
 
 フェーズ0 Task 4 と同じチェックリスト(接続拒否・切替拒否・チェーン未登録・watchAsset 拒否からの復帰)を `/setup` 上で通す。
 
-- [ ] **Step 3: コミット**
+- [x] **Step 3: コミット**
 
 ```bash
 git add -A

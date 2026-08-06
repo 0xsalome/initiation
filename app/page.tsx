@@ -1,13 +1,13 @@
-import { ConnectWallet } from "@/components/ConnectWallet";
-import { SignInWithEthereum } from "@/components/SignInWithEthereum";
-import { WalletSetup } from "@/components/WalletSetup";
+import Link from "next/link";
 
 export default function Home() {
   return (
     <main>
-      <ConnectWallet />
-      <SignInWithEthereum />
-      <WalletSetup />
+      <h1>HENKAKU Initiation</h1>
+      <p>ウォレットを準備して、Initiationをはじめましょう。</p>
+      <Link className="primaryLink" href="/setup">
+        ウォレットセットアップへ →
+      </Link>
     </main>
   );
 }
