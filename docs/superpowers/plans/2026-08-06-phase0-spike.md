@@ -609,7 +609,7 @@ git commit -m "feat: SIWE authentication with iron-session"
 - Consumes: Task 2 の `wagmiConfig`、`useSwitchChain` / `useWatchAsset`(wagmi v2)
 - Produces: `lib/henkakuToken.ts` の `henkakuTokenConfig(): { address: \`0x${string}\`; symbol: string; decimals: number; image?: string }`(env から組み立て、必須値欠落時は throw)。`<WalletSetup />` は「接続→切替→追加」の3ステップ UI。フェーズ1 Task 5 が同じ構成で本実装する。
 
-- [ ] **Step 1: トークン設定の失敗するテストを書く**
+- [x] **Step 1: トークン設定の失敗するテストを書く**
 
 `lib/__tests__/henkakuToken.test.ts`:
 
@@ -645,12 +645,12 @@ describe("henkakuTokenConfig", () => {
 });
 ```
 
-- [ ] **Step 2: テストが失敗することを確認する**
+- [x] **Step 2: テストが失敗することを確認する**
 
 Run: `mise exec -- npm test`
 Expected: FAIL(`@/lib/henkakuToken` が存在しない)
 
-- [ ] **Step 3: `lib/henkakuToken.ts` を実装する**
+- [x] **Step 3: `lib/henkakuToken.ts` を実装する**
 
 ```ts
 // ABOUTME: HENKAKU トークン(ERC20 / Polygon)の設定値。env から読み、起動時に検証する。
@@ -669,12 +669,12 @@ export function henkakuTokenConfig() {
 }
 ```
 
-- [ ] **Step 4: テストが通ることを確認する**
+- [x] **Step 4: テストが通ることを確認する**
 
 Run: `mise exec -- npm test`
 Expected: PASS
 
-- [ ] **Step 5: `WalletSetup` コンポーネントを実装する**
+- [x] **Step 5: `WalletSetup` コンポーネントを実装する**
 
 wagmi v2 の `useSwitchChain` は対象チェーンが未登録なら内部で `wallet_addEthereumChain` にフォールバックする。拒否はすべて復帰可能エラーとして表示する。
 
@@ -735,7 +735,7 @@ export function WalletSetup() {
 
 `app/page.tsx` に `<WalletSetup />` を追加する。
 
-- [ ] **Step 6: 手動検証(復帰パス含む)**
+- [x] **Step 6: 手動検証(復帰パス含む)**
 
 - Polygon 未選択の状態で「切り替える」→ MetaMask の切替ダイアログ → 承認で切替完了
 - 切替ダイアログで「拒否」→ エラー表示 → 再試行で復帰
@@ -743,7 +743,7 @@ export function WalletSetup() {
 - 「トークンを追加」→ MetaMask に HENKAKU が表示される
 - 追加ダイアログで「拒否」→ エラー表示のみで、他のステップは進行できる
 
-- [ ] **Step 7: コミット**
+- [x] **Step 7: コミット**
 
 ```bash
 git add -A
