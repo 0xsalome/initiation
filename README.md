@@ -16,7 +16,7 @@ HENKAKUコミュニティへの参加を、ウォレット準備からInitiation
 
 ## 開発環境
 
-- Node.js / npm: [mise](https://mise.jdx.dev/) 経由
+- Node.js 20.9 以上 / npm（開発時の確認は Node.js 24 系）。バージョン管理ツールは各自の好みで構いません
 - Next.js App Router / TypeScript
 - wagmi + viem: ウォレット接続、Polygon切替、`wallet_watchAsset`
 - SIWE + iron-session: ウォレット署名認証とセッション
@@ -30,7 +30,7 @@ HENKAKUコミュニティへの参加を、ウォレット準備からInitiation
 ```bash
 git clone <repository-url>
 cd initiation
-mise exec -- npm install
+npm install
 cp .env.example .env.local
 ```
 
@@ -52,9 +52,9 @@ cp .env.example .env.local
 ### ローカルSupabase
 
 ```bash
-mise exec -- npx supabase start
-mise exec -- npx supabase status
-mise exec -- npx supabase db reset
+npx supabase start
+npx supabase status
+npx supabase db reset
 ```
 
 `supabase status` で確認したローカルAPI URLとservice role keyを、値がログに残らないように `.env.local` へ設定します。統合テストはローカルSupabaseが起動している状態で実行してください。
@@ -62,7 +62,7 @@ mise exec -- npx supabase db reset
 ### 開発サーバー
 
 ```bash
-mise exec -- npm run dev -- --port 3000
+npm run dev -- --port 3000
 ```
 
 既存の開発サーバーがある場合は、同じポートに新しいプロセスを重ねて起動しないでください。
@@ -70,10 +70,10 @@ mise exec -- npm run dev -- --port 3000
 ## 検証コマンド
 
 ```bash
-mise exec -- npm test
-mise exec -- npx tsc --noEmit
-mise exec -- npm run lint
-mise exec -- npm run build
+npm test
+npx tsc --noEmit
+npm run lint
+npm run build
 ```
 
 テストは `tests/unit/` と `tests/integration/` に分けています。Supabaseを使う統合テストの補助コードは `tests/support/` にあります。テスト対象は `tests/**/*.test.ts` です。
