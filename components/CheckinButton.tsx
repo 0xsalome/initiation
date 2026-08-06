@@ -5,6 +5,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { checkin } from "@/app/checkin/actions";
+import { buttonStyles } from "@/lib/ui";
 
 export function CheckinButton() {
   const [message, setMessage] = useState<string | null>(null);
@@ -27,11 +28,12 @@ export function CheckinButton() {
   }
 
   return (
-    <div>
-      <button type="button" disabled={pending} onClick={submit}>
+    <div className="rounded-2xl border border-brand/20 bg-brand/5 p-6">
+      <p className="text-sm font-semibold text-foreground">今日の参加を記録します。</p>
+      <button className={`${buttonStyles.primary} mt-4`} type="button" disabled={pending} onClick={submit}>
         {pending ? "チェックイン中…" : "今日のチェックイン"}
       </button>
-      {message && <p role="status">{message}</p>}
+      {message && <p className="mt-3 text-sm font-semibold text-foreground" role="status">{message}</p>}
     </div>
   );
 }

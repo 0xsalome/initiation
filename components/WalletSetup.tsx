@@ -5,6 +5,7 @@
 import { useAccount, useSwitchChain, useWatchAsset } from "wagmi";
 import { polygon } from "wagmi/chains";
 import { henkakuTokenConfig } from "@/lib/henkakuToken";
+import { buttonStyles } from "@/lib/ui";
 
 export function WalletSetup() {
   const { chainId, isConnected } = useAccount();
@@ -16,14 +17,16 @@ export function WalletSetup() {
     isPending: watching,
   } = useWatchAsset();
 
-  if (!isConnected) return null;
+  if (!isConnected) {
+    return <p className="text-sm leading-6 text-muted">先にウォレットを接続してください。</p>;
+  }
 
   let token: ReturnType<typeof henkakuTokenConfig>;
   try {
     token = henkakuTokenConfig();
   } catch {
     return (
-      <p role="alert">
+      <p className="text-sm font-semibold text-rose-600 dark:text-rose-300" role="alert">
         HENKAKU トークン設定がありません。NEXT_PUBLIC_HENKAKU_TOKEN_ADDRESS を設定してください。
       </p>
     );
@@ -32,12 +35,13 @@ export function WalletSetup() {
   const onPolygon = chainId === polygon.id;
 
   return (
-    <ol>
-      <li>
+    <ol className="space-y-3">
+      <li className="rounded-lg border border-border bg-surface-hover p-3 text-sm">
         {onPolygon ? (
-          "Polygon に接続済み"
+          <p className="font-semibold text-emerald-700 dark:text-emerald-300">✓ Polygon に接続済み</p>
         ) : (
           <button
+            className={buttonStyles.secondary}
             type="button"
             disabled={switching}
             onClick={() => switchChain({ chainId: polygon.id })}
@@ -46,11 +50,14 @@ export function WalletSetup() {
           </button>
         )}
         {switchError && (
-          <p role="alert">切り替えできませんでした。もう一度お試しください。</p>
+          <p className="mt-2 text-sm font-semibold text-rose-600 dark:text-rose-300" role="alert">
+            切り替えできませんでした。もう一度お試しください。
+          </p>
         )}
       </li>
-      <li>
+      <li className="rounded-lg border border-border bg-surface-hover p-3 text-sm">
         <button
+          className={buttonStyles.secondary}
           type="button"
           disabled={!onPolygon || watching}
           onClick={() =>
@@ -68,9 +75,15 @@ export function WalletSetup() {
           HENKAKU トークンをウォレットに追加
         </button>
         {watched && (
-          <p>追加リクエストを送りました（表示されない場合も進行に影響はありません）</p>
+          <p className="mt-2 text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+            追加リクエストを送りました（表示されない場合も進行に影響はありません）
+          </p>
         )}
-        {watchError && <p role="alert">追加できませんでした。スキップしても構いません。</p>}
+        {watchError && (
+          <p className="mt-2 text-sm font-semibold text-rose-600 dark:text-rose-300" role="alert">
+            追加できませんでした。スキップしても構いません。
+          </p>
+        )}
       </li>
     </ol>
   );

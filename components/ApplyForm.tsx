@@ -5,6 +5,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { submitApplication } from "@/app/apply/actions";
+import { buttonStyles } from "@/lib/ui";
 
 export function ApplyForm() {
   const [error, setError] = useState<string | null>(null);
@@ -24,14 +25,14 @@ export function ApplyForm() {
   }
 
   return (
-    <div>
-      <p>
+    <section className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+      <p className="leading-7 text-muted">
         申請すると運営メンバーが内容を確認し、Allowlist追加とHENKAKUの送付を手作業で行います。
       </p>
-      <button type="button" disabled={pending} onClick={submit}>
+      <button className={`${buttonStyles.primary} mt-5`} type="button" disabled={pending} onClick={submit}>
         {pending ? "申請中…" : "申請する"}
       </button>
-      {error && <p role="alert">{error}</p>}
-    </div>
+      {error && <p className="mt-3 text-sm font-semibold text-rose-600 dark:text-rose-300" role="alert">{error}</p>}
+    </section>
   );
 }

@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import type { ProgressEntry } from "@/lib/domain/types";
 import type { InitiationStep } from "@/lib/initiation/content";
 import { saveStep } from "@/app/initiation/actions";
+import { buttonStyles, inputStyles } from "@/lib/ui";
 
 export function InitiationSteps({
   steps,
@@ -18,9 +19,9 @@ export function InitiationSteps({
   const byId = new Map(entries.map((entry) => [entry.stepId, entry]));
 
   return (
-    <ol>
+    <ol className="space-y-4">
       {steps.map((step) => (
-        <li key={step.id}>
+        <li className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6" key={step.id}>
           <StepItem step={step} entry={byId.get(step.id)} />
         </li>
       ))}
@@ -50,33 +51,36 @@ function StepItem({ step, entry }: { step: InitiationStep; entry?: ProgressEntry
 
   return (
     <section>
-      <h2>
+      <h2 className="text-xl font-bold text-foreground">
         {step.title} {saved && "✅"}
       </h2>
       {step.kind === "question" ? (
         <>
-          <p>{step.prompt}</p>
-          <label htmlFor={`answer-${step.id}`}>回答</label>
+          <p className="mt-2 leading-7 text-muted">{step.prompt}</p>
+          <label className="mt-4 block text-sm font-semibold text-foreground" htmlFor={`answer-${step.id}`}>
+            回答
+          </label>
           <textarea
+            className={`${inputStyles} mt-2 min-h-28 resize-y`}
             id={`answer-${step.id}`}
             value={answer}
             onChange={(event) => setAnswer(event.target.value)}
           />
-          <button type="button" disabled={pending} onClick={() => submit(answer)}>
+          <button className={`${buttonStyles.primary} mt-3`} type="button" disabled={pending} onClick={() => submit(answer)}>
             {pending ? "保存中…" : "回答を保存"}
           </button>
         </>
       ) : (
         <>
-          <p>{step.description}</p>
+          <p className="mt-2 leading-7 text-muted">{step.description}</p>
           {!saved && (
-            <button type="button" disabled={pending} onClick={() => submit(null)}>
+            <button className={`${buttonStyles.secondary} mt-3`} type="button" disabled={pending} onClick={() => submit(null)}>
               {pending ? "保存中…" : "完了にする"}
             </button>
           )}
         </>
       )}
-      {error && <p role="alert">{error}</p>}
+      {error && <p className="mt-3 text-sm font-semibold text-rose-600 dark:text-rose-300" role="alert">{error}</p>}
     </section>
   );
 }

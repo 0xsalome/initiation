@@ -3,6 +3,7 @@
 "use client";
 
 import { useAccount, useConnect, useDisconnect } from "wagmi";
+import { buttonStyles } from "@/lib/ui";
 
 export function ConnectWallet() {
   const { address, isConnected } = useAccount();
@@ -11,19 +12,31 @@ export function ConnectWallet() {
 
   if (isConnected) {
     return (
-      <div>
-        <p data-testid="address">{address}</p>
-        <button onClick={() => disconnect()}>切断</button>
+      <div className="space-y-3">
+        <p className="break-all rounded-lg bg-surface-hover px-3 py-2 font-mono text-xs text-foreground" data-testid="address">
+          {address}
+        </p>
+        <button className={buttonStyles.quiet} type="button" onClick={() => disconnect()}>
+          切断
+        </button>
       </div>
     );
   }
 
   return (
-    <div>
-      <button onClick={() => connect({ connector: connectors[0] })}>
+    <div className="space-y-3">
+      <button
+        className={buttonStyles.primary}
+        type="button"
+        onClick={() => connect({ connector: connectors[0] })}
+      >
         ウォレットを接続
       </button>
-      {error && <p role="alert">接続できませんでした: {error.message}</p>}
+      {error && (
+        <p className="text-sm font-semibold text-rose-600 dark:text-rose-300" role="alert">
+          接続できませんでした: {error.message}
+        </p>
+      )}
     </div>
   );
 }

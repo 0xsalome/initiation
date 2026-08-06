@@ -5,6 +5,7 @@ import { CheckinButton } from "@/components/CheckinButton";
 import type { Checkin } from "@/lib/domain/types";
 import { requireMember, UnauthenticatedError } from "@/lib/auth/guards";
 import { getRepositories } from "@/lib/repositories";
+import { cardStyles } from "@/lib/ui";
 
 export default async function CheckinPage() {
   let history: Checkin[];
@@ -14,8 +15,8 @@ export default async function CheckinPage() {
   } catch (error) {
     if (error instanceof UnauthenticatedError) {
       return (
-        <main>
-          <p>
+        <main className={cardStyles}>
+          <p className="leading-7 text-muted">
             先に <Link href="/setup">ウォレットセットアップ</Link> でサインインしてください。
           </p>
         </main>
@@ -25,20 +26,27 @@ export default async function CheckinPage() {
   }
 
   return (
-    <main>
-      <h1>チェックイン</h1>
-      <p>今日の活動を記録しましょう。</p>
+    <main className="space-y-8">
+      <header>
+        <p className="text-sm font-bold uppercase tracking-[0.2em] text-brand">Step 3</p>
+        <h1 className="mt-2 text-3xl font-black tracking-tight text-foreground sm:text-4xl">チェックイン</h1>
+        <p className="mt-3 leading-7 text-muted">今日の活動を記録して、コミュニティとの接点を残しましょう。</p>
+      </header>
       <CheckinButton />
-      <h2>これまでのチェックイン</h2>
-      {history.length > 0 ? (
-        <ul>
+      <section className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+        <h2 className="text-xl font-bold text-foreground">これまでのチェックイン</h2>
+        {history.length > 0 ? (
+          <ul className="mt-4 grid gap-2 sm:grid-cols-2">
           {history.map((checkin) => (
-            <li key={checkin.id}>{checkin.checkinDate}</li>
+              <li className="rounded-lg bg-surface-hover px-4 py-3 text-sm font-semibold text-foreground" key={checkin.id}>
+                {checkin.checkinDate}
+              </li>
           ))}
-        </ul>
-      ) : (
-        <p>まだ履歴はありません。</p>
-      )}
+          </ul>
+        ) : (
+          <p className="mt-3 text-muted">まだ履歴はありません。</p>
+        )}
+      </section>
     </main>
   );
 }

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import type { ApplicationWithMember, StatusField } from "@/lib/domain/types";
 import { transitionApplication } from "@/app/admin/actions";
+import { buttonStyles, inputStyles } from "@/lib/ui";
 
 export function AdminApplicationRow({ application }: { application: ApplicationWithMember }) {
   const [error, setError] = useState<string | null>(null);
@@ -33,21 +34,25 @@ export function AdminApplicationRow({ application }: { application: ApplicationW
   const review = application.reviewStatus;
 
   return (
-    <tr>
-      <td>
-        <span title={application.walletAddress}>{application.walletAddress}</span>
-        {application.displayName && <small>（{application.displayName}）</small>}
+    <tr className="align-top">
+      <td className="px-4 py-4">
+        <span className="font-mono text-xs text-foreground" title={application.walletAddress}>
+          {application.walletAddress}
+        </span>
+        {application.displayName && <small className="mt-1 block text-muted">（{application.displayName}）</small>}
       </td>
-      <td>{review}</td>
-      <td>{application.allowlistStatus}</td>
-      <td>{application.distributionStatus}</td>
-      <td>
-        {(review === "pending" || review === "needs_info") && (
-          <>
-            <button type="button" disabled={pending} onClick={() => run("review", "approved")}>
+      <td className="px-4 py-4 font-semibold text-foreground">{review}</td>
+      <td className="px-4 py-4 font-semibold text-foreground">{application.allowlistStatus}</td>
+      <td className="px-4 py-4 font-semibold text-foreground">{application.distributionStatus}</td>
+      <td className="min-w-[28rem] px-4 py-4">
+        <div className="flex flex-wrap items-center gap-2">
+          {(review === "pending" || review === "needs_info") && (
+            <>
+            <button className={buttonStyles.primary} type="button" disabled={pending} onClick={() => run("review", "approved")}>
               承認
             </button>
             <button
+              className={buttonStyles.secondary}
               type="button"
               disabled={pending}
               onClick={() => run("review", "rejected", { reason: "運営判断" })}
@@ -55,38 +60,41 @@ export function AdminApplicationRow({ application }: { application: ApplicationW
               却下
             </button>
             {review === "pending" && (
-              <button type="button" disabled={pending} onClick={() => run("review", "needs_info")}>
+              <button className={buttonStyles.quiet} type="button" disabled={pending} onClick={() => run("review", "needs_info")}>
                 要追加情報
               </button>
             )}
-          </>
-        )}
-        {review === "approved" && application.allowlistStatus !== "added" && (
-          <button type="button" disabled={pending} onClick={() => run("allowlist", "added")}>
-            Allowlist 追加済みにする
-          </button>
-        )}
-        {review === "approved" && application.distributionStatus !== "sent" && (
-          <>
-            <label>
-              配布 tx hash
+            </>
+          )}
+          {review === "approved" && application.allowlistStatus !== "added" && (
+            <button className={buttonStyles.secondary} type="button" disabled={pending} onClick={() => run("allowlist", "added")}>
+              Allowlist 追加済みにする
+            </button>
+          )}
+          {review === "approved" && application.distributionStatus !== "sent" && (
+            <>
+              <label className="flex items-center gap-2 text-sm font-semibold text-muted">
+                <span className="sr-only">配布 tx hash</span>
               <input
+                className={`${inputStyles} inline-block w-64 text-sm`}
                 type="text"
                 value={txId}
                 onChange={(event) => setTxId(event.target.value)}
                 placeholder="0x…"
               />
-            </label>
-            <button
-              type="button"
-              disabled={pending}
-              onClick={() => run("distribution", "sent", { txId })}
-            >
-              配布済みにする
-            </button>
-          </>
-        )}
-        {error && <p role="alert">{error}</p>}
+              </label>
+              <button
+                className={buttonStyles.primary}
+                type="button"
+                disabled={pending}
+                onClick={() => run("distribution", "sent", { txId })}
+              >
+                配布済みにする
+              </button>
+            </>
+          )}
+        </div>
+        {error && <p className="mt-3 text-sm font-semibold text-rose-600 dark:text-rose-300" role="alert">{error}</p>}
       </td>
     </tr>
   );

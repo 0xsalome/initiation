@@ -2,7 +2,7 @@
 // ABOUTME: ウォレット操作で使うチェーンとトランスポートを一箇所に定義する。
 import { createConfig, http } from "wagmi";
 import { polygon } from "wagmi/chains";
-import { injected } from "wagmi/connectors";
+import { injected } from "wagmi/connectors/injected";
 
 export const wagmiConfig = createConfig({
   chains: [polygon],

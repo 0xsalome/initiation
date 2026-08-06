@@ -18,28 +18,50 @@ export default async function AdminPage() {
   const applications = await getRepositories().applications.listAll();
 
   return (
-    <main>
-      <h1>申請一覧</h1>
+    <main className="space-y-8">
+      <header>
+        <p className="text-sm font-bold uppercase tracking-[0.2em] text-brand">運営</p>
+        <h1 className="mt-2 text-3xl font-black tracking-tight text-foreground sm:text-4xl">申請一覧</h1>
+        <p className="mt-3 max-w-2xl leading-7 text-muted">
+          Allowlist と HENKAKU 配布の状態を確認し、運営操作を行います。
+        </p>
+      </header>
       {applications.length === 0 ? (
-        <p>申請はまだありません。</p>
+        <p className="rounded-2xl border border-border bg-card p-6 leading-7 text-muted shadow-sm">
+          申請はまだありません。
+        </p>
       ) : (
-        <table>
-          <caption>AllowlistとHENKAKU配布の申請</caption>
-          <thead>
-            <tr>
-              <th scope="col">アドレス</th>
-              <th scope="col">審査</th>
-              <th scope="col">Allowlist</th>
-              <th scope="col">配布</th>
-              <th scope="col">操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            {applications.map((application) => (
-              <AdminApplicationRow key={application.id} application={application} />
-            ))}
-          </tbody>
-        </table>
+        <div className="overflow-x-auto rounded-2xl border border-border bg-card shadow-sm">
+          <table className="min-w-[56rem] w-full border-collapse text-left text-sm">
+            <caption className="px-4 py-4 text-left text-sm font-semibold text-muted">
+              Allowlist と HENKAKU 配布の申請
+            </caption>
+            <thead className="border-y border-border bg-surface-hover text-xs uppercase tracking-wide text-muted">
+              <tr>
+                <th className="px-4 py-3 font-semibold" scope="col">
+                  アドレス
+                </th>
+                <th className="px-4 py-3 font-semibold" scope="col">
+                  審査
+                </th>
+                <th className="px-4 py-3 font-semibold" scope="col">
+                  Allowlist
+                </th>
+                <th className="px-4 py-3 font-semibold" scope="col">
+                  配布
+                </th>
+                <th className="px-4 py-3 font-semibold" scope="col">
+                  操作
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {applications.map((application) => (
+                <AdminApplicationRow key={application.id} application={application} />
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </main>
   );

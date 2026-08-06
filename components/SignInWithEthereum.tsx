@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { SiweMessage } from "siwe";
 import { useAccount, useSignMessage } from "wagmi";
 import { polygon } from "wagmi/chains";
+import { buttonStyles } from "@/lib/ui";
 
 export function SignInWithEthereum() {
   const { address, chainId } = useAccount();
@@ -55,13 +56,27 @@ export function SignInWithEthereum() {
     }
   }
 
-  if (!address) return null;
-  if (signedInAs) return <p>サインイン済み: {signedInAs}</p>;
+  if (!address) {
+    return <p className="text-sm leading-6 text-muted">先にウォレットを接続してください。</p>;
+  }
+  if (signedInAs) {
+    return (
+      <p className="break-all rounded-lg bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-200">
+        サインイン済み: {signedInAs}
+      </p>
+    );
+  }
 
   return (
-    <div>
-      <button onClick={signIn}>署名してサインイン</button>
-      {error && <p role="alert">{error}</p>}
+    <div className="space-y-3">
+      <button className={buttonStyles.primary} type="button" onClick={signIn}>
+        署名してサインイン
+      </button>
+      {error && (
+        <p className="text-sm font-semibold text-rose-600 dark:text-rose-300" role="alert">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
