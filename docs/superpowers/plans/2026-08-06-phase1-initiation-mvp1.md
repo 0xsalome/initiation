@@ -1225,7 +1225,7 @@ git commit -m "feat: initiation steps screen with progress persistence"
 - Consumes: Task 2 `CheckinRepository`、Task 3 `requireMember`
 - Produces: Server Action `checkin(): Promise<{ ok: boolean; alreadyCheckedIn?: boolean; error?: string }>`、`/checkin` ページ(ボタン + 履歴一覧)
 
-- [ ] **Step 1: 失敗するテストを書く**
+- [x] **Step 1: 失敗するテストを書く**
 
 `tests/unit/app/checkin/actions.test.ts`:
 
@@ -1260,7 +1260,7 @@ describe("checkin", () => {
 
 Run: `mise exec -- npm test` → Expected: FAIL
 
-- [ ] **Step 2: 実装してテストを通す**
+- [x] **Step 2: 実装してテストを通す**
 
 `app/checkin/actions.ts`:
 
@@ -1284,7 +1284,7 @@ export async function checkin(): Promise<{ ok: boolean; alreadyCheckedIn?: boole
 
 Run: `mise exec -- npm test` → Expected: PASS
 
-- [ ] **Step 3: ページを実装する**
+- [x] **Step 3: ページを実装する**
 
 `app/checkin/page.tsx`(Server Component で履歴取得 + 小さな Client ボタン。ボタンは `components/` に切らずページ内 Client Component ファイルにしてよいが、ここでは同パターンの `InitiationSteps` に合わせ `components/CheckinButton.tsx` を作っても可。最小実装):
 
@@ -1358,7 +1358,7 @@ export function CheckinButton() {
 }
 ```
 
-- [ ] **Step 4: 手動検証とコミット**
+- [x] **Step 4: 手動検証とコミット**
 
 チェックイン → 履歴に今日の日付。もう一度押す → 「チェックイン済み」。
 
