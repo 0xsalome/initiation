@@ -1,0 +1,85 @@
+# ABOUTME: PRとmainへのpushで、READMEの検証コマンドを自動実行する。
+# ABOUTME: 単体・静的チェックと、ローカルSupabaseを使う統合テストを分けて動かす。
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static:
+    name: build / typecheck / lint / unit (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # package.jsonのengines.nodeとREADMEが動作環境として挙げる下限
+        node: ["22"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - run: npm ci
+
+      # tscはNext.jsがbuildで生成する型に依存するため、buildを先に実行する
+      - run: npm run build
+
+      - run: npx tsc --noEmit
+
+      - run: npm run lint
+
+      # 統合テストはSupabaseを必要とするため、このjobでは単体テストのみ実行する
+      - run: npx vitest run tests/unit
+
+  integration:
+    name: integration tests (local supabase)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - run: npm ci
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      # テストはREST API経由でのみDBへアクセスするため、不要なサービスは起動しない。
+      # gotrueは除外しない(除外するとsupabase statusがキーを返さなくなる)。
+      # 起動時にservice-role keyを標準出力へ表示するため、標準出力はログへ流さない
+      # (add-maskは既に出力された値を遡ってマスクできない)。標準エラー出力は残す。
+      - name: Start local Supabase
+        run: supabase start -x realtime,storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor > /dev/null
+
+      # 起動時にもmigrationは適用されるが、スキーマがmigrationと一致することを明示的に保証する
+      - name: Apply migrations
+        run: supabase db reset
+
+      # キーの値をログへ出力しない(AGENTS.md)。コマンド出力は変数へ取り込み、
+      # add-maskでマスクしたうえでjobの環境変数へ渡す。
+      - name: Export Supabase connection to the job environment
+        run: |
+          eval "$(supabase status -o env)"
+          echo "::add-mask::$SERVICE_ROLE_KEY"
+          {
+            echo "SUPABASE_URL=$API_URL"
+            echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
+          } >> "$GITHUB_ENV"
+
+      - run: npx vitest run tests/integration
