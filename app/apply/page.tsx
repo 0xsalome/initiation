@@ -2,17 +2,11 @@
 // ABOUTME: 申請後のAllowlist追加とHENKAKU送付は運営が手作業で行う。
 import Link from "next/link";
 import { ApplyForm } from "@/components/ApplyForm";
+import { allowlistLabel, distributionLabel, reviewLabel } from "@/lib/applicationLabels";
 import type { Application } from "@/lib/domain/types";
 import { requireMember, UnauthenticatedError } from "@/lib/auth/guards";
 import { getRepositories } from "@/lib/repositories";
 import { cardStyles } from "@/lib/ui";
-
-const REVIEW_LABEL: Record<Application["reviewStatus"], string> = {
-  pending: "審査待ち",
-  needs_info: "追加情報が必要です（運営から連絡します）",
-  approved: "承認済み",
-  rejected: "見送りになりました",
-};
 
 export default async function ApplyPage() {
   let application: Application | null;
@@ -49,18 +43,16 @@ export default async function ApplyPage() {
           <dl className="mt-5 divide-y divide-border">
             <div className="grid gap-1 py-3 sm:grid-cols-[10rem_1fr] sm:gap-4">
               <dt className="text-sm font-semibold text-muted">審査</dt>
-              <dd className="font-semibold text-foreground">{REVIEW_LABEL[application.reviewStatus]}</dd>
+              <dd className="font-semibold text-foreground">{reviewLabel[application.reviewStatus]}</dd>
             </div>
             <div className="grid gap-1 py-3 sm:grid-cols-[10rem_1fr] sm:gap-4">
               <dt className="text-sm font-semibold text-muted">Allowlist</dt>
-              <dd className="font-semibold text-foreground">{application.allowlistStatus === "added" ? "追加済み" : "未実施"}</dd>
+              <dd className="font-semibold text-foreground">{allowlistLabel(application.allowlistStatus)}</dd>
             </div>
             <div className="grid gap-1 py-3 sm:grid-cols-[10rem_1fr] sm:gap-4">
               <dt className="text-sm font-semibold text-muted">HENKAKU 配布</dt>
               <dd className="font-semibold text-foreground">
-                {application.distributionStatus === "sent"
-                  ? `送付済み (tx: ${application.distributionTxId ?? "記録なし"})`
-                  : "未実施"}
+                {distributionLabel(application.distributionStatus, application.distributionTxId)}
               </dd>
             </div>
           </dl>

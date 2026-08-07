@@ -184,6 +184,91 @@ describe("transitionApplication", () => {
     expect(result.error).toContain("再読み込み");
   });
 
+  it("requires a reason when recording an allowlist failure", async () => {
+    listAllMock.mockResolvedValue([application({ reviewStatus: "approved" })]);
+
+    const result = await transitionApplication({
+      applicationId: "a1",
+      field: "allowlist",
+      toStatus: "failed",
+    });
+
+    expect(result).toEqual({ ok: false, error: "失敗理由を入力してください" });
+    expect(transitionMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects a whitespace-only failure reason", async () => {
+    listAllMock.mockResolvedValue([application({ reviewStatus: "approved" })]);
+
+    const result = await transitionApplication({
+      applicationId: "a1",
+      field: "distribution",
+      toStatus: "failed",
+      reason: "   ",
+    });
+
+    expect(result).toEqual({ ok: false, error: "失敗理由を入力してください" });
+    expect(transitionMock).not.toHaveBeenCalled();
+  });
+
+  it("records an allowlist failure with the trimmed reason", async () => {
+    listAllMock.mockResolvedValue([application({ reviewStatus: "approved" })]);
+
+    const result = await transitionApplication({
+      applicationId: "a1",
+      field: "allowlist",
+      toStatus: "failed",
+      reason: "  ガス不足でrevert  ",
+    });
+
+    expect(result).toEqual({ ok: true });
+    expect(transitionMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        field: "allowlist",
+        toStatus: "failed",
+        reason: "ガス不足でrevert",
+        actorAddress: ADMIN_ADDR,
+      }),
+    );
+  });
+
+  it("records a distribution failure with the reason", async () => {
+    listAllMock.mockResolvedValue([application({ reviewStatus: "approved" })]);
+
+    const result = await transitionApplication({
+      applicationId: "a1",
+      field: "distribution",
+      toStatus: "failed",
+      reason: "Safeの署名が集まらず期限切れ",
+    });
+
+    expect(result).toEqual({ ok: true });
+    expect(transitionMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        field: "distribution",
+        toStatus: "failed",
+        reason: "Safeの署名が集まらず期限切れ",
+      }),
+    );
+  });
+
+  it("keeps a recorded failure recoverable to the completed status", async () => {
+    listAllMock.mockResolvedValue([
+      application({ reviewStatus: "approved", allowlistStatus: "failed" }),
+    ]);
+
+    const result = await transitionApplication({
+      applicationId: "a1",
+      field: "allowlist",
+      toStatus: "added",
+    });
+
+    expect(result).toEqual({ ok: true });
+    expect(transitionMock).toHaveBeenCalledWith(
+      expect.objectContaining({ field: "allowlist", toStatus: "added" }),
+    );
+  });
+
   it("returns an error for an unknown application id", async () => {
     listAllMock.mockResolvedValue([]);
 

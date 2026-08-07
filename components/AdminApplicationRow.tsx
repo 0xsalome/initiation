@@ -11,6 +11,7 @@ import { buttonStyles, inputStyles } from "@/lib/ui";
 export function AdminApplicationRow({ application }: { application: ApplicationWithMember }) {
   const [error, setError] = useState<string | null>(null);
   const [txId, setTxId] = useState("");
+  const [failureReason, setFailureReason] = useState("");
   const [pending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -93,6 +94,41 @@ export function AdminApplicationRow({ application }: { application: ApplicationW
               </button>
             </>
           )}
+          {review === "approved" &&
+            (application.allowlistStatus === "pending" || application.distributionStatus === "pending") && (
+              <>
+                <label className="flex items-center gap-2 text-sm font-semibold text-muted">
+                  <span className="sr-only">失敗理由</span>
+                  <input
+                    className={`${inputStyles} inline-block w-64 text-sm`}
+                    type="text"
+                    value={failureReason}
+                    onChange={(event) => setFailureReason(event.target.value)}
+                    placeholder="失敗理由（失敗として記録する場合）"
+                  />
+                </label>
+                {application.allowlistStatus === "pending" && (
+                  <button
+                    className={buttonStyles.quiet}
+                    type="button"
+                    disabled={pending}
+                    onClick={() => run("allowlist", "failed", { reason: failureReason })}
+                  >
+                    Allowlist 失敗として記録
+                  </button>
+                )}
+                {application.distributionStatus === "pending" && (
+                  <button
+                    className={buttonStyles.quiet}
+                    type="button"
+                    disabled={pending}
+                    onClick={() => run("distribution", "failed", { reason: failureReason })}
+                  >
+                    配布 失敗として記録
+                  </button>
+                )}
+              </>
+            )}
         </div>
         {error && <p className="mt-3 text-sm font-semibold text-rose-600 dark:text-rose-300" role="alert">{error}</p>}
       </td>
