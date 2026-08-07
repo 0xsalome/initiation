@@ -71,12 +71,14 @@ npm run dev -- --port 3000
 
 ```bash
 npm test
-npx tsc --noEmit
 npm run lint
 npm run build
+npx tsc --noEmit
 ```
 
-テストは `tests/unit/` と `tests/integration/` に分けています。Supabaseを使う統合テストの補助コードは `tests/support/` にあります。テスト対象は `tests/**/*.test.ts` です。
+クローン直後は `npm run build`（または `npm run dev`）を先に実行してください。Next.jsがビルド時に生成する型（`LayoutProps` など）ができるまで、`npx tsc --noEmit` は失敗します。
+
+テストは `tests/unit/` と `tests/integration/` に分けています。Supabaseを使う統合テストの補助コードは `tests/support/` にあります。テスト対象は `tests/**/*.test.ts` です。統合テストは `.env.local` のSupabase設定を自動で読み込むため、ローカルSupabaseを起動し `.env.local` を設定した状態で `npm test` を実行してください。
 
 ## アーキテクチャの境界
 

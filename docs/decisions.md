@@ -60,3 +60,11 @@
 - 自動確認: Vitest 62件、TypeScript、lint、本番buildが成功した。管理者ウォレットで `/admin` の状態遷移も確認した。
 - 本番デプロイ: Vercel / Supabase 本番プロジェクトへの変更は、運用準備と本番環境情報が揃うまで延期する。現時点では本番環境を作成・変更しない。
 - 再開条件: 本番Supabaseプロジェクト、Vercelプロジェクト、`SESSION_PASSWORD`・Supabaseキー・`ADMIN_ADDRESSES`等の環境変数、公開前のプライバシー方針を確定する。Safe Walletからの実配布を含む本番一巡確認はその後に行う。
+
+## 2026-08-07 統合テストの環境変数読み込み(Issue #1)
+
+- 課題: `.env.local` に Supabase の値を設定しても、Vitest はこれを読まないため統合テストが失敗する。READMEだけを読む新規コントリビューターは、シェルで環境変数を渡す必要があることに辿り着けなかった。
+- 決定: `vitest.config.ts` で dotenv により `.env.local` を読み込む。
+- 秘密情報の方針との整合: dotenv はキーの値をログに出力しない(件数とパスのみ。`quiet: true` でそれも抑止)。「キーの値をログやコマンド出力に表示しない」方針(AGENTS.md)と矛盾しない。
+- 既存運用との互換: dotenv は設定済みの環境変数を上書きしないため、CI やシェルから環境変数を渡す従来の実行方法もそのまま使える。`.env.local` が存在しない環境ではno-opで、単体テストのみの実行に影響しない。
+- 対象は Vitest のみ。`next dev` / `next build` は従来どおり Next.js 自身が `.env.local` を読む。

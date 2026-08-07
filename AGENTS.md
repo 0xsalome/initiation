@@ -2,8 +2,8 @@
 
 HENKAKU Initiation。docs/development-plan.md が全体計画、docs/superpowers/plans/ が実装計画。
 
-- Node/npm は mise 経由: `mise exec -- npm <cmd>`
-- テスト: `mise exec -- npm test`(Vitest)
+- Node.js 20.9 以上 / npm(バージョン管理ツールは各自の好みで)
+- テスト: `npm test`(Vitest)
 - 環境変数は .env.local(コミット禁止)。変数名一覧は .env.example
 - 決定事項は docs/decisions.md に記録
 
@@ -19,23 +19,24 @@ HENKAKU Initiation。docs/development-plan.md が全体計画、docs/superpowers
 
 ```bash
 # 開発サーバー(既存のプロセスを確認してから起動する)
-mise exec -- npm run dev -- --port 3000
+npm run dev -- --port 3000
 
 # 単体・統合テスト
-mise exec -- npm test
+npm test
 
 # 型チェック / lint / 本番build
-mise exec -- npx tsc --noEmit
-mise exec -- npm run lint
-mise exec -- npm run build
+# クローン直後はbuildが生成する型ができるまでtscが失敗するため、build を先に実行する
+npm run build
+npx tsc --noEmit
+npm run lint
 
 # ローカルSupabase
-mise exec -- npx supabase start
-mise exec -- npx supabase status
-mise exec -- npx supabase db reset  # ローカルDBを初期化する場合のみ
+npx supabase start
+npx supabase status
+npx supabase db reset  # ローカルDBを初期化する場合のみ
 ```
 
-統合テストはローカルSupabaseのサービスキーを環境変数へ渡して実行する。キーの値をログやコマンド出力に表示しない。本番Supabaseへのmigration適用とVercelデプロイは、運用入力と公開前チェックが確定してから行う。
+統合テストは `.env.local` のローカルSupabase設定を自動で読み込む(`vitest.config.ts`)。CI等では従来どおり環境変数で渡してもよい。キーの値をログやコマンド出力に表示しない。本番Supabaseへのmigration適用とVercelデプロイは、運用入力と公開前チェックが確定してから行う。
 
 ## テスト配置
 
