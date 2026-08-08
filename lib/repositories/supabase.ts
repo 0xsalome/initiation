@@ -12,6 +12,7 @@ import type {
   StatusField,
 } from "@/lib/domain/types";
 import {
+  ConcurrentTransitionError,
   DuplicateApplicationError,
   type ApplicationRepository,
   type CheckinRepository,
@@ -175,18 +176,11 @@ const applications: ApplicationRepository = {
     });
   },
 
-  async transition({ applicationId, field, toStatus, actorAddress, reason, txId }) {
+  async transition({ applicationId, field, toStatus, expectedStatus, actorAddress, reason, txId }) {
     const statusColumn = STATUS_COLUMN[field];
     if (!statusColumn) throw new Error(`invalid application field: ${field}`);
 
     const c = client();
-    const { data: current, error: readError } = await c
-      .from("applications")
-      .select("*")
-      .eq("id", applicationId)
-      .single();
-    if (readError) throw readError;
-
     const update: Row = {
       [statusColumn]: toStatus,
       updated_at: new Date().toISOString(),
@@ -194,16 +188,23 @@ const applications: ApplicationRepository = {
     if (reason !== undefined) update.reason = reason;
     if (field === "distribution" && txId !== undefined) update.distribution_tx_id = txId;
 
-    const { error: updateError } = await c
+    // 検証時のステータスを条件に含めることで、読み取りから更新までの間に
+    // 別の管理者が遷移させていた場合はこのUPDATEが0行となり、上書きを防ぐ。
+    const { data: updated, error: updateError } = await c
       .from("applications")
       .update(update)
-      .eq("id", applicationId);
+      .eq("id", applicationId)
+      .eq(statusColumn, expectedStatus)
+      .select("id")
+      .maybeSingle();
     if (updateError) throw updateError;
+    if (!updated) throw new ConcurrentTransitionError();
 
+    // UPDATEが成功した時点で遷移前の値は expectedStatus だったことが保証される。
     const { error: eventError } = await c.from("application_events").insert({
       application_id: applicationId,
       field,
-      from_status: (current as Row)[statusColumn],
+      from_status: expectedStatus,
       to_status: toStatus,
       actor_address: normalizeAddress(actorAddress),
       reason: reason ?? null,

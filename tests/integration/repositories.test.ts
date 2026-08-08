@@ -2,7 +2,11 @@
 // ABOUTME: 重複申請、監査イベント、日次チェックインをローカルDBで確認する。
 import { beforeEach, describe, expect, it } from "vitest";
 import { normalizeAddress } from "@/lib/domain/address";
-import { DuplicateApplicationError, getRepositories } from "@/lib/repositories";
+import {
+  ConcurrentTransitionError,
+  DuplicateApplicationError,
+  getRepositories,
+} from "@/lib/repositories";
 import { testClient, truncateAll } from "@/tests/support/repositories";
 
 const ADDR = normalizeAddress("0x1111111111111111111111111111111111111111");
@@ -46,6 +50,7 @@ describe("repositories (local supabase)", () => {
       applicationId: app.id,
       field: "review",
       toStatus: "rejected",
+      expectedStatus: "pending",
       actorAddress: ADMIN,
       reason: "情報不足",
     });
@@ -61,6 +66,7 @@ describe("repositories (local supabase)", () => {
       applicationId: app.id,
       field: "distribution",
       toStatus: "sent",
+      expectedStatus: "pending",
       actorAddress: ADMIN,
       reason: "Safeで送付完了を確認",
       txId: "0xdeadbeef",
@@ -72,11 +78,49 @@ describe("repositories (local supabase)", () => {
     expect(data).toHaveLength(1);
     expect(data![0]).toMatchObject({
       field: "distribution",
+      from_status: "pending",
       to_status: "sent",
       actor_address: ADMIN,
       reason: "Safeで送付完了を確認",
       tx_id: "0xdeadbeef",
     });
+  });
+
+  it("rejects a transition whose expected status is stale", async () => {
+    const { members, applications } = getRepositories();
+    const m = await members.upsertByAddress(ADDR);
+    const app = await applications.create(m.id);
+
+    // 管理者1がrejectedへ遷移させる
+    await applications.transition({
+      applicationId: app.id,
+      field: "review",
+      toStatus: "rejected",
+      expectedStatus: "pending",
+      actorAddress: ADMIN,
+      reason: "運営判断",
+    });
+
+    // 管理者2はpendingを読んだ状態のまま、approvedへ遷移させようとする
+    await expect(
+      applications.transition({
+        applicationId: app.id,
+        field: "review",
+        toStatus: "approved",
+        expectedStatus: "pending",
+        actorAddress: ADMIN,
+      }),
+    ).rejects.toBeInstanceOf(ConcurrentTransitionError);
+
+    // 終端状態は上書きされず、監査ログにも不正な遷移が残らない
+    const listed = await applications.listAll();
+    expect(listed[0].reviewStatus).toBe("rejected");
+    const { data } = await testClient()
+      .from("application_events")
+      .select("*")
+      .eq("application_id", app.id);
+    expect(data).toHaveLength(1);
+    expect(data![0]).toMatchObject({ from_status: "pending", to_status: "rejected" });
   });
 
   it("checks in once per day", async () => {

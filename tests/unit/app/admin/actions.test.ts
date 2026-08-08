@@ -9,20 +9,24 @@ const {
   requireAdminMock,
   MockForbiddenError,
   MockUnauthenticatedError,
+  MockConcurrentTransitionError,
 } = vi.hoisted(() => {
   class MockForbiddenError extends Error {}
   class MockUnauthenticatedError extends Error {}
+  class MockConcurrentTransitionError extends Error {}
   return {
     transitionMock: vi.fn(),
     listAllMock: vi.fn(),
     requireAdminMock: vi.fn(),
     MockForbiddenError,
     MockUnauthenticatedError,
+    MockConcurrentTransitionError,
   };
 });
 
 vi.mock("@/lib/repositories", () => ({
   getRepositories: () => ({ applications: { transition: transitionMock, listAll: listAllMock } }),
+  ConcurrentTransitionError: MockConcurrentTransitionError,
 }));
 
 vi.mock("@/lib/auth/guards", () => ({
@@ -123,6 +127,7 @@ describe("transitionApplication", () => {
       applicationId: "a1",
       field: "allowlist",
       toStatus: "added",
+      expectedStatus: "pending",
       actorAddress: ADMIN_ADDR,
       reason: "コントラクト側で追加を確認",
       txId: undefined,
@@ -144,10 +149,39 @@ describe("transitionApplication", () => {
       applicationId: "a1",
       field: "distribution",
       toStatus: "sent",
+      expectedStatus: "pending",
       actorAddress: ADMIN_ADDR,
       reason: undefined,
       txId: "0xabc123",
     });
+  });
+
+  it("passes the validated status as expectedStatus for conditional update", async () => {
+    listAllMock.mockResolvedValue([application({ reviewStatus: "needs_info" })]);
+
+    await transitionApplication({
+      applicationId: "a1",
+      field: "review",
+      toStatus: "approved",
+    });
+
+    expect(transitionMock).toHaveBeenCalledWith(
+      expect.objectContaining({ field: "review", expectedStatus: "needs_info" }),
+    );
+  });
+
+  it("reports a reload prompt when another admin transitioned first", async () => {
+    listAllMock.mockResolvedValue([application()]);
+    transitionMock.mockRejectedValueOnce(new MockConcurrentTransitionError());
+
+    const result = await transitionApplication({
+      applicationId: "a1",
+      field: "review",
+      toStatus: "approved",
+    });
+
+    expect(result.ok).toBe(false);
+    expect(result.error).toContain("再読み込み");
   });
 
   it("returns an error for an unknown application id", async () => {

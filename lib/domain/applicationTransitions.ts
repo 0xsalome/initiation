@@ -22,6 +22,12 @@ const EXECUTION_TRANSITIONS: Record<string, Record<string, string[]>> = {
   },
 };
 
+export function currentStatus(app: Application, field: StatusField): string {
+  if (field === "review") return app.reviewStatus;
+  if (field === "allowlist") return app.allowlistStatus;
+  return app.distributionStatus;
+}
+
 export function validateTransition(
   app: Application,
   field: StatusField,
@@ -44,7 +50,7 @@ export function validateTransition(
     return { ok: false, reason: `不明な状態フィールドです: ${field}` };
   }
 
-  const current = field === "allowlist" ? app.allowlistStatus : app.distributionStatus;
+  const current = currentStatus(app, field);
   const allowed = transitions[current] ?? [];
   if (!allowed.includes(toStatus)) {
     return { ok: false, reason: `${field}: ${current} -> ${toStatus} は許可されていません` };

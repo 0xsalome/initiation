@@ -26,10 +26,16 @@ export interface ApplicationRepository {
   findActiveByMember(memberId: string): Promise<Application | null>;
   create(memberId: string): Promise<Application>;
   listAll(): Promise<ApplicationWithMember[]>;
+  /**
+   * 状態を遷移させる。`expectedStatus` は呼び出し側が遷移ルールを検証した時点の値で、
+   * 実装はこれを条件にした条件付き更新を行う。DB上の値が変わっていた場合は
+   * 何も書き換えずに ConcurrentTransitionError を投げる。
+   */
   transition(params: {
     applicationId: string;
     field: StatusField;
     toStatus: string;
+    expectedStatus: string;
     actorAddress: Address;
     reason?: string;
     txId?: string;
@@ -45,6 +51,14 @@ export class DuplicateApplicationError extends Error {
   constructor(message = "active application already exists") {
     super(message);
     this.name = "DuplicateApplicationError";
+  }
+}
+
+/** 検証時のステータスから変わっていたため、遷移を適用しなかったことを示す。 */
+export class ConcurrentTransitionError extends Error {
+  constructor(message = "application status changed since validation") {
+    super(message);
+    this.name = "ConcurrentTransitionError";
   }
 }
 

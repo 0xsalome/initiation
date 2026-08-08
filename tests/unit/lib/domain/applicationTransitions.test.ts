@@ -1,7 +1,7 @@
 // ABOUTME: 申請ステータスの許可・拒否ルールを検証する。
 // ABOUTME: 審査承認前の実行禁止と終端状態の保護を確認する。
 import { describe, expect, it } from "vitest";
-import { validateTransition } from "@/lib/domain/applicationTransitions";
+import { currentStatus, validateTransition } from "@/lib/domain/applicationTransitions";
 import type { Application } from "@/lib/domain/types";
 
 function app(overrides: Partial<Application> = {}): Application {
@@ -54,5 +54,18 @@ describe("validateTransition", () => {
 
   it("rejects an unknown status value", () => {
     expect(validateTransition(app(), "review", "banana").ok).toBe(false);
+  });
+});
+
+describe("currentStatus", () => {
+  it("returns the status of the given field", () => {
+    const target = app({
+      reviewStatus: "approved",
+      allowlistStatus: "added",
+      distributionStatus: "failed",
+    });
+    expect(currentStatus(target, "review")).toBe("approved");
+    expect(currentStatus(target, "allowlist")).toBe("added");
+    expect(currentStatus(target, "distribution")).toBe("failed");
   });
 });
