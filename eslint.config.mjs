@@ -13,6 +13,9 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
     "supabase/.temp/**",
+    // VitePressのビルド成果物とキャッシュ(生成物なのでlint対象外)
+    "docs/.vitepress/dist/**",
+    "docs/.vitepress/cache/**",
   ]),
 ]);
 

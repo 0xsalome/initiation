@@ -11,7 +11,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.1",
@@ -36,6 +39,7 @@
     "tailwindcss": "^4.3.3",
     "tsx": "^4.23.9",
     "typescript": "^5",
+    "vitepress": "^1.6.4",
     "vitest": "^4.1.10"
   }
 }
