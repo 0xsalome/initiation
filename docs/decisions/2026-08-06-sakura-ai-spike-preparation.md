@@ -1,6 +1,6 @@
 # 2026-08-06 さくらの AI Engine スパイク（準備）
 
-- 公式仕様: OpenAI 互換の chat completions は `https://api.ai.sakura.ad.jp/v1/chat/completions`。認証は `Authorization: Bearer <アカウントトークン>`。
+- 公式仕様: OpenAI 互換の chat completions は `https://api.ai.sakura.ad.jp/v1/chat/completions`。認証は `Authorization: Bearer {アカウントトークン}`。
 - 公式の利用手順にあるモデル例: `gpt-oss-120b`。
 - 無償枠: chat completions は月 3,000 リクエストまで。超過時はレート制限。
 - 応答の `usage` に `prompt_tokens` / `completion_tokens` / `total_tokens` が含まれる。
