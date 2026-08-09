@@ -43,7 +43,7 @@
 - [x] **Step 1: create-next-app でリポジトリ直下に scaffold する**
 
 ```bash
-cd /Users/masumi/tmp/initiation
+cd initiation
 mise exec -- npx create-next-app@latest . --typescript --app --eslint --no-tailwind --no-src-dir --import-alias "@/*" --use-npm
 ```
 
