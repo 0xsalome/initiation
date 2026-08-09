@@ -37,13 +37,19 @@ export async function transitionApplication(params: {
       return { ok: false, error: "トランザクションIDを入力してください" };
     }
 
+    // 失敗の記録は再試行の判断材料になるため、Runbookどおり理由を必須にする。
+    const reason = params.reason?.trim() || undefined;
+    if (params.toStatus === "failed" && !reason) {
+      return { ok: false, error: "失敗理由を入力してください" };
+    }
+
     await repositories.applications.transition({
       applicationId: params.applicationId,
       field: params.field,
       toStatus: params.toStatus,
       expectedStatus: currentStatus(application, params.field),
       actorAddress: address,
-      reason: params.reason,
+      reason,
       txId,
     });
     return { ok: true };
