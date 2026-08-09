@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
 
-// 統合テスト用に .env.local の Supabase 設定を読み込む(2026-08-07 decisions.md)。
+// 統合テスト用に .env.local の Supabase 設定を読み込む(2026-08-07-vitest-env-local.md)。
 // 値はログに出さず、シェルで設定済みの環境変数は上書きしない。
 dotenv.config({ path: path.resolve(rootDir, ".env.local"), quiet: true });
 

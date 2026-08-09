@@ -1876,7 +1876,7 @@ git commit -m "docs: manual operations runbook for approval and distribution"
 ### Task 12: 通し確認とデプロイ(フェーズ1完了条件)
 
 **Files:**
-- Modify: `docs/decisions.md`(完了記録)
+- Create: `docs/decisions/YYYY-MM-DD-phase-1-completion.md`(完了記録)
 - Modify: `AGENTS.md`(ページ構成・テスト実行方法を追記)
 
 **Interfaces:**
@@ -1903,7 +1903,7 @@ git commit -m "docs: manual operations runbook for approval and distribution"
 
 - [ ] **Step 3: 完了記録を書いてコミット**
 
-`docs/decisions.md` にフェーズ1完了日・本番 URL・残課題(仮コンテンツの差し替え状況、runbook の暫定箇所)を記録。`AGENTS.md` にページ構成(/setup, /initiation, /checkin, /apply, /admin)とテスト・migration の実行方法を追記。
+`docs/decisions/YYYY-MM-DD-phase-1-completion.md` を作成し、フェーズ1完了日・本番 URL・残課題(仮コンテンツの差し替え状況、runbook の暫定箇所)を記録。`AGENTS.md` にページ構成(/setup, /initiation, /checkin, /apply, /admin)とテスト・migration の実行方法を追記。
 
 ```bash
 git add -A

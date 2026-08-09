@@ -5,7 +5,7 @@ HENKAKU Initiation。docs/development-plan.md が全体計画、docs/superpowers
 - Node.js 22.0.0 以上 / npm(バージョン管理ツールは各自の好みで)
 - テスト: `npm test`(Vitest)
 - 環境変数は .env.local(コミット禁止)。変数名一覧は .env.example
-- 決定事項は docs/decisions.md に記録
+- 決定事項は `docs/decisions/` に1決定1ファイルで記録。命名規則は `docs/decisions.md` を参照
 
 ## ページ構成
 
