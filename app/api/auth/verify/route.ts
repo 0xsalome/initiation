@@ -4,7 +4,7 @@ import { polygon } from "wagmi/chains";
 import { normalizeAddress } from "@/lib/domain/address";
 import { getRepositories } from "@/lib/repositories";
 import { getSession } from "@/lib/session";
-import { verifySiweMessage } from "@/lib/siwe";
+import { parseAllowedDomains, verifySiweMessage } from "@/lib/siwe";
 
 type VerifyBody = {
   message?: unknown;
@@ -37,12 +37,11 @@ export async function POST(request: Request) {
     return Response.json({ error: "invalid request" }, { status: 400 });
   }
 
-  const host = request.headers.get("host") ?? "";
   const result = await verifySiweMessage({
     message: body.message,
     signature: body.signature as `0x${string}`,
     expectedNonce: nonce,
-    expectedDomain: host,
+    allowedDomains: parseAllowedDomains(process.env.SIWE_ALLOWED_DOMAINS),
     expectedChainId: polygon.id,
   });
 

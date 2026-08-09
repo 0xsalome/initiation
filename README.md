@@ -42,6 +42,7 @@ cp .env.example .env.local
 | 変数 | 用途 | 公開可否 |
 | --- | --- | --- |
 | `SESSION_PASSWORD` | セッション暗号化（32文字以上） | 非公開 |
+| `SIWE_ALLOWED_DOMAINS` | SIWE署名を受け付けるドメイン（カンマ区切り） | 公開可・既定値あり |
 | `SUPABASE_URL` | Supabase接続先 | 環境による |
 | `SUPABASE_SERVICE_ROLE_KEY` | サーバー側Repository接続 | 非公開 |
 | `ADMIN_ADDRESSES` | 管理画面を使えるウォレット（カンマ区切り） | アドレス自体は公開情報だが環境変数で管理 |
