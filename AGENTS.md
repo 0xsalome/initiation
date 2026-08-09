@@ -2,7 +2,7 @@
 
 HENKAKU Initiation。docs/development-plan.md が全体計画、docs/superpowers/plans/ が実装計画。
 
-- Node.js 20.9 以上 / npm(バージョン管理ツールは各自の好みで)
+- Node.js 22.0.0 以上 / npm(バージョン管理ツールは各自の好みで)
 - テスト: `npm test`(Vitest)
 - 環境変数は .env.local(コミット禁止)。変数名一覧は .env.example
 - 決定事項は docs/decisions.md に記録
