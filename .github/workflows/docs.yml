@@ -1,0 +1,72 @@
+# ABOUTME: 開発者ドキュメントサイト(VitePress)のビルド検証とGitHub Pagesへの公開。
+# ABOUTME: アプリ本体のCIとはファイル・jobを分け、docs関連の変更時のみ実行する。
+name: Docs
+
+on:
+  pull_request:
+    paths:
+      - "docs/**"
+      - ".github/workflows/docs.yml"
+      - "package.json"
+      - "package-lock.json"
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - ".github/workflows/docs.yml"
+      - "package.json"
+      - "package-lock.json"
+  # Pagesの初回公開や、手動での再公開に使う
+  workflow_dispatch:
+
+# GitHub Pagesへのデプロイに必要な最小限の権限
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 公開中のデプロイを中断しない。並行実行はキューに入れる。
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: build docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # lastUpdatedの表示に履歴が必要
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - run: npm ci
+
+      # リンク切れがあるとVitePressのビルドが失敗するため、これが検証を兼ねる
+      - run: npm run docs:build
+
+      - uses: actions/configure-pages@v5
+        if: github.event_name != 'pull_request'
+
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request'
+        with:
+          path: docs/.vitepress/dist
+
+  deploy:
+    name: deploy to GitHub Pages
+    # Pull Requestではデプロイせず、ビルド検証のみ行う
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

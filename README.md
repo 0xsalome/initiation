@@ -4,6 +4,8 @@ HENKAKUコミュニティへの参加を、ウォレット準備からInitiation
 
 現在はフェーズ1 MVP-1のローカル実装です。承認・Allowlist追加・HENKAKU配布は人が行い、AI機能と本番デプロイはまだ保留しています。
 
+> **はじめて参加する方へ**: 環境構築から最初のPull Requestまでを順に案内する[開発者ドキュメント](https://henkaku-center.github.io/initiation/)があります。用語の説明、成功時に表示されるもの、症状別のトラブルシューティングを載せています。このREADMEは概要と要点をまとめた入口です。
+
 ## 参加者向けの流れ
 
 画面上部のメニューから、次の順番で進めます。
@@ -79,7 +81,7 @@ npx tsc --noEmit
 
 クローン直後は `npm run build`（または `npm run dev`）を先に実行してください。Next.jsがビルド時に生成する型（`LayoutProps` など）ができるまで、`npx tsc --noEmit` は失敗します。
 
-これらはPull Requestと `main` へのpushで GitHub Actions（`.github/workflows/ci.yml`）が自動実行します。統合テストはCI上でもローカルSupabaseを起動して実行するため、追加のシークレット設定は不要です。
+コマンドごとの詳細と絞り込み方法は[検証コマンド一覧](https://henkaku-center.github.io/initiation/reference/commands)にあります。
 
 テストは `tests/unit/` と `tests/integration/` に分けています。Supabaseを使う統合テストの補助コードは `tests/support/` にあります。テスト対象は `tests/**/*.test.ts` です。統合テストは `.env.local` のSupabase設定を自動で読み込むため、ローカルSupabaseを起動し `.env.local` を設定した状態で `npm test` を実行してください。
 
