@@ -93,9 +93,15 @@ openssl rand -base64 32
 HENKAKU トークン設定がありません。NEXT_PUBLIC_HENKAKU_TOKEN_ADDRESS を設定してください。
 ```
 
-**原因**: `NEXT_PUBLIC_HENKAKU_TOKEN_ADDRESS` が未設定です。この値は現在リポジトリに記載がありません（[Issue #2](https://github.com/henkaku-center/initiation/issues/2)）。
+**原因**: `NEXT_PUBLIC_HENKAKU_TOKEN_ADDRESS` が未設定です。`.env.example` には既定値が入っているので、`.env.local` を古い版から引き継いでいるか、手で消してしまった可能性があります。
 
-**対処**: 値が確定するまで、この画面の完全な動作確認はできません。ドキュメント修正やテストの追加であれば、未設定のまま作業を進められます。
+**対処**: `.env.local` に次の値を設定して、開発サーバーを再起動します。
+
+```
+NEXT_PUBLIC_HENKAKU_TOKEN_ADDRESS=0x0cc91a5FFC2E9370eC565Ab42ECE33bbC08C11a2
+```
+
+`NEXT_PUBLIC_` で始まる変数はビルド時にブラウザ向けへ埋め込まれるため、**再起動しないと反映されません。**
 
 ## `/admin` が404になる
 

@@ -14,10 +14,10 @@
 | `SUPABASE_URL` | Supabaseの接続先 | 環境による |
 | `SUPABASE_SERVICE_ROLE_KEY` | サーバー側Repositoryの接続 | 非公開 |
 | `ADMIN_ADDRESSES` | 管理画面を使えるウォレット（カンマ区切り） | アドレス自体は公開情報だが環境変数で管理 |
-| `NEXT_PUBLIC_HENKAKU_TOKEN_ADDRESS` | Polygon上のHENKAKUコントラクト | 公開可 |
-| `NEXT_PUBLIC_HENKAKU_TOKEN_SYMBOL` | トークン表示名 | 公開可 |
-| `NEXT_PUBLIC_HENKAKU_TOKEN_DECIMALS` | トークン小数桁 | 公開可 |
-| `NEXT_PUBLIC_HENKAKU_TOKEN_LOGO_URL` | ウォレット表示用ロゴ | 公開可 |
+| `NEXT_PUBLIC_HENKAKU_TOKEN_ADDRESS` | Polygon上のHENKAKUコントラクト | 公開可・既定値あり |
+| `NEXT_PUBLIC_HENKAKU_TOKEN_SYMBOL` | トークン表示名 | 公開可・既定値あり |
+| `NEXT_PUBLIC_HENKAKU_TOKEN_DECIMALS` | トークン小数桁 | 公開可・既定値あり |
+| `NEXT_PUBLIC_HENKAKU_TOKEN_LOGO_URL` | ウォレット表示用ロゴ | 公開可・既定値あり |
 | `SAKURA_AI_API_KEY` | AI Engineスパイク用キー | 非公開・現在は本番未使用 |
 | `SAKURA_AI_BASE_URL` | AI EngineのベースURL | 環境変数で管理 |
 
@@ -56,11 +56,22 @@ ADMIN_ADDRESSES=0xaaa...,0xbbb...
 
 `ADMIN_ADDRESSES` は管理画面へのアクセス制御にだけ使われ、トークンの配布権限を与えるものではありません。
 
-### NEXT_PUBLIC_HENKAKU_TOKEN_ADDRESS
+### NEXT_PUBLIC_HENKAKU_TOKEN_*
 
-Polygon上のHENKAKUトークンのコントラクトアドレスです。
+Polygon上のHENKAKUトークンの情報です。4つとも公開情報のため `.env.example` に開発用の既定値が入っており、**通常は変更不要です。**
 
-**この値は現在リポジトリに記載がありません**（[Issue #2](https://github.com/henkaku-center/initiation/issues/2)）。未設定だと `/setup` に「HENKAKU トークン設定がありません」と表示されます。
+| 変数 | 既定値 |
+| --- | --- |
+| `NEXT_PUBLIC_HENKAKU_TOKEN_ADDRESS` | `0x0cc91a5FFC2E9370eC565Ab42ECE33bbC08C11a2` |
+| `NEXT_PUBLIC_HENKAKU_TOKEN_SYMBOL` | `HENKAKU` |
+| `NEXT_PUBLIC_HENKAKU_TOKEN_DECIMALS` | `18` |
+| `NEXT_PUBLIC_HENKAKU_TOKEN_LOGO_URL` | `https://raw.githubusercontent.com/henkaku-center/omise-interface/main/public/henkakuToken.png` |
+
+`ADDRESS` が未設定だと `/setup` に「HENKAKU トークン設定がありません」と表示されます。
+
+`/setup` はこれらを `wallet_watchAsset` でウォレットへ渡します。**誤ったアドレスを設定すると、利用者が意図しないトークンを自分のウォレットへ追加してしまいます。** 値を変える場合は根拠を[決定事項ログ](/decisions)へ記録してください。
+
+`SYMBOL` と `DECIMALS` は未設定でも `HENKAKU` / `18` が既定値として使われます（`lib/henkakuToken.ts`）。`LOGO_URL` は任意で、未設定ならウォレット側の既定表示になります。
 
 ### SAKURA_AI_API_KEY / SAKURA_AI_BASE_URL
 

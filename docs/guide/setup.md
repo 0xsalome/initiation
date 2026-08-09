@@ -23,7 +23,7 @@
 
 ### 必須
 
-**Node.js 20.9 以上**と**npm**が必要です。バージョン管理ツール（nvm、mise、Volta など）は各自の好みで構いません。
+**Node.js 22.0.0 以上**と**npm**が必要です。バージョン管理ツール（nvm、mise、Volta など）は各自の好みで構いません。
 
 ```bash
 node -v
@@ -37,7 +37,11 @@ v24.4.1
 11.4.2
 ```
 
-`v20.9.0` 以上であれば問題ありません。表示されない場合は [Node.js](https://nodejs.org/) を入れてください。
+`v22.0.0` 以上であれば問題ありません。表示されない場合は [Node.js](https://nodejs.org/) を入れてください。
+
+::: warning Node.js 20 では動きません
+このプロジェクトが使う `@supabase/supabase-js` などは Node.js 22 以上を要求します。Node.js 20 で進めると、次の手順の `npm install` で `EBADENGINE` という警告が出て、以降のビルドやテストでも警告が続きます。バージョンが古い場合は先に上げてください。
+:::
 
 **Git** も必要です。
 
@@ -111,11 +115,20 @@ ADMIN_ADDRESSES=0xあなたのアドレス
 
 複数指定する場合はカンマ区切りです。設定を変えたら開発サーバーを再起動してください。
 
-### HENKAKUトークンのアドレス
+### HENKAKUトークンの設定
 
-`NEXT_PUBLIC_HENKAKU_TOKEN_ADDRESS` は現在リポジトリに記載がありません（[Issue #2](https://github.com/henkaku-center/initiation/issues/2)）。空のままだと `/setup` の画面に「HENKAKU トークン設定がありません」と表示されます。
+`NEXT_PUBLIC_HENKAKU_TOKEN_*` の4つは公開情報のため、`.env.example` に開発用の既定値が入っています。**変更は不要です。**
 
-ドキュメント修正やテストの追加であれば、空のままでも作業を進められます。
+コピーした `.env.local` に次の値が入っていることだけ確認してください。空になっている場合は `/setup` の画面に「HENKAKU トークン設定がありません」と表示されます。
+
+```
+NEXT_PUBLIC_HENKAKU_TOKEN_ADDRESS=0x0cc91a5FFC2E9370eC565Ab42ECE33bbC08C11a2
+NEXT_PUBLIC_HENKAKU_TOKEN_SYMBOL=HENKAKU
+NEXT_PUBLIC_HENKAKU_TOKEN_DECIMALS=18
+NEXT_PUBLIC_HENKAKU_TOKEN_LOGO_URL=https://raw.githubusercontent.com/henkaku-center/omise-interface/main/public/henkakuToken.png
+```
+
+このアドレスはPolygon上のHENKAKUトークンで、`/setup` がウォレットへ「トークンを追加しますか」と尋ねるときに渡す値です。値の根拠は[決定事項ログ](/decisions)に記録しています。
 
 ## 4. ローカルSupabaseの起動
 
