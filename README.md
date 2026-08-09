@@ -43,12 +43,23 @@ cp .env.example .env.local
 | `SUPABASE_URL` | Supabase接続先 | 環境による |
 | `SUPABASE_SERVICE_ROLE_KEY` | サーバー側Repository接続 | 非公開 |
 | `ADMIN_ADDRESSES` | 管理画面を使えるウォレット（カンマ区切り） | アドレス自体は公開情報だが環境変数で管理 |
-| `NEXT_PUBLIC_HENKAKU_TOKEN_ADDRESS` | Polygon上のHENKAKUコントラクト | 公開可 |
-| `NEXT_PUBLIC_HENKAKU_TOKEN_SYMBOL` | トークン表示名 | 公開可 |
-| `NEXT_PUBLIC_HENKAKU_TOKEN_DECIMALS` | トークン小数桁 | 公開可 |
-| `NEXT_PUBLIC_HENKAKU_TOKEN_LOGO_URL` | ウォレット表示用ロゴ | 公開可 |
+| `NEXT_PUBLIC_HENKAKU_TOKEN_ADDRESS` | Polygon上のHENKAKUコントラクト | 公開可・既定値あり |
+| `NEXT_PUBLIC_HENKAKU_TOKEN_SYMBOL` | トークン表示名 | 公開可・既定値あり |
+| `NEXT_PUBLIC_HENKAKU_TOKEN_DECIMALS` | トークン小数桁 | 公開可・既定値あり |
+| `NEXT_PUBLIC_HENKAKU_TOKEN_LOGO_URL` | ウォレット表示用ロゴ | 公開可・既定値あり |
 | `SAKURA_AI_API_KEY` | AI Engineスパイク用キー | 非公開・現在は本番未使用 |
 | `SAKURA_AI_BASE_URL` | AI EngineのベースURL | 環境変数で管理 |
+
+`NEXT_PUBLIC_HENKAKU_TOKEN_*` の4つは公開情報のため `.env.example` に開発用の既定値が入っています。`/setup` を動かすだけならこの4つは変更不要です。
+
+| 変数 | 開発用の既定値 |
+| --- | --- |
+| `NEXT_PUBLIC_HENKAKU_TOKEN_ADDRESS` | `0x0cc91a5FFC2E9370eC565Ab42ECE33bbC08C11a2` |
+| `NEXT_PUBLIC_HENKAKU_TOKEN_SYMBOL` | `HENKAKU` |
+| `NEXT_PUBLIC_HENKAKU_TOKEN_DECIMALS` | `18` |
+| `NEXT_PUBLIC_HENKAKU_TOKEN_LOGO_URL` | `https://raw.githubusercontent.com/henkaku-center/omise-interface/main/public/henkakuToken.png` |
+
+`/setup` はこのアドレスを `wallet_watchAsset` でウォレットへ渡します。**誤ったアドレスを設定すると利用者が別のトークンを追加してしまう**ため、値を変える場合は [決定事項の記録](docs/decisions/2026-08-09-henkaku-token-defaults.md) もあわせて更新してください。
 
 ### ローカルSupabase
 
