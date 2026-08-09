@@ -79,6 +79,8 @@ npx tsc --noEmit
 
 クローン直後は `npm run build`（または `npm run dev`）を先に実行してください。Next.jsがビルド時に生成する型（`LayoutProps` など）ができるまで、`npx tsc --noEmit` は失敗します。
 
+これらはPull Requestと `main` へのpushで GitHub Actions（`.github/workflows/ci.yml`）が自動実行します。統合テストはCI上でもローカルSupabaseを起動して実行するため、追加のシークレット設定は不要です。
+
 テストは `tests/unit/` と `tests/integration/` に分けています。Supabaseを使う統合テストの補助コードは `tests/support/` にあります。テスト対象は `tests/**/*.test.ts` です。統合テストは `.env.local` のSupabase設定を自動で読み込むため、ローカルSupabaseを起動し `.env.local` を設定した状態で `npm test` を実行してください。
 
 ## アーキテクチャの境界
@@ -97,7 +99,7 @@ npx tsc --noEmit
 
 1. Issueで目的と変更範囲を共有する
 2. `main` から作業ブランチを作る（例: `agent/navigation-readme`）
-3. テストを先に追加し、実装後に `npm test`・型チェック・lintを実行する
+3. テストを先に追加し、実装後に `npm test`・型チェック・lintを実行する（PR作成後はCIでも自動実行されます）
 4. 秘密情報や個人情報をコミットしない
 5. 変更理由、検証内容、未解決の判断をPull Requestに書く
 6. UI変更はスクリーンショットまたは手動確認手順を添える

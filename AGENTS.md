@@ -6,6 +6,7 @@ HENKAKU Initiation。docs/development-plan.md が全体計画、docs/superpowers
 - テスト: `npm test`(Vitest)
 - 環境変数は .env.local(コミット禁止)。変数名一覧は .env.example
 - 決定事項は `docs/decisions/` に1決定1ファイルで記録。命名規則は `docs/decisions.md` を参照
+- CI: PRとmainへのpushで `.github/workflows/ci.yml` が検証コマンドを実行する
 
 ## ページ構成
 
