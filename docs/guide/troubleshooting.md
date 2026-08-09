@@ -75,6 +75,27 @@ npx supabase start
 `npx supabase stop --no-backup` や `npx supabase db reset` は手元のデータベースの中身を消します。手元の開発用データなので通常は問題ありませんが、確認したい記録が残っている場合は先に控えてください。
 :::
 
+### `container is not ready: unhealthy` で失敗する
+
+```
+{"_tag":"Error","error":{"message":"supabase_db_initiation: container is not ready: unhealthy"}}
+```
+
+このメッセージ自体は原因を示していません。**本当の原因はその前に流れているログにあります。** Dockerの空き容量が足りない場合は、次の行が出ています。
+
+```
+initdb: error: could not create directory "/var/lib/postgresql/data/pg_wal": No space left on device
+```
+
+**対処**: Dockerが使っていない領域を削除してから、もう一度起動します。
+
+```bash
+docker system df       # 使用量と回収可能な容量を確認する
+docker system prune -f # 停止中のコンテナ・未使用イメージを削除する
+```
+
+`docker system prune` は**動いていないコンテナと、どこからも使われていないイメージを消します。** 他のプロジェクトで使っているイメージも再取得が必要になる場合があるため、表示される確認内容を読んでから実行してください。
+
 ## `SESSION_PASSWORD must be at least 32 characters`
 
 **原因**: `.env.local` の `SESSION_PASSWORD` が未設定か、32文字未満です。

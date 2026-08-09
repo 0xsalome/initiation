@@ -215,9 +215,11 @@ npm test
 成功時:
 
 ```
-Test Files  14 passed (14)
-     Tests  64 passed (64)
+Test Files  15 passed (15)
+     Tests  78 passed (78)
 ```
+
+件数はテストが増えるたびに変わります。**`failed` が0で、すべて `passed` と表示されていれば成功**です。
 
 ::: tip 統合テストについて
 テストは単体テストとローカルSupabaseを使う統合テストに分かれています。統合テストは `.env.local` のSupabase設定を自動で読み込むため、Supabaseを起動した状態で `npm test` を実行すれば両方が走ります。Supabaseを起動していない場合、統合テストは失敗します。
