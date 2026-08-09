@@ -121,10 +121,12 @@ function toApplication(row: Row): Application {
   };
 }
 
-const STATUS_COLUMN: Record<StatusField, string> = {
-  review: "review_status",
-  allowlist: "allowlist_status",
-  distribution: "distribution_status",
+// どのフィールドがどの列に対応するかは transition_application 関数が持つ。
+// ここは受け付ける値の網羅性だけをRecordで担保する(StatusFieldを増やすと型エラーになる)。
+const VALID_STATUS_FIELDS: Record<StatusField, true> = {
+  review: true,
+  allowlist: true,
+  distribution: true,
 };
 
 const applications: ApplicationRepository = {
@@ -177,40 +179,23 @@ const applications: ApplicationRepository = {
   },
 
   async transition({ applicationId, field, toStatus, expectedStatus, actorAddress, reason, txId }) {
-    const statusColumn = STATUS_COLUMN[field];
-    if (!statusColumn) throw new Error(`invalid application field: ${field}`);
+    if (!VALID_STATUS_FIELDS[field]) throw new Error(`invalid application field: ${field}`);
 
-    const c = client();
-    const update: Row = {
-      [statusColumn]: toStatus,
-      updated_at: new Date().toISOString(),
-    };
-    if (reason !== undefined) update.reason = reason;
-    if (field === "distribution" && txId !== undefined) update.distribution_tx_id = txId;
-
-    // 検証時のステータスを条件に含めることで、読み取りから更新までの間に
-    // 別の管理者が遷移させていた場合はこのUPDATEが0行となり、上書きを防ぐ。
-    const { data: updated, error: updateError } = await c
-      .from("applications")
-      .update(update)
-      .eq("id", applicationId)
-      .eq(statusColumn, expectedStatus)
-      .select("id")
-      .maybeSingle();
-    if (updateError) throw updateError;
-    if (!updated) throw new ConcurrentTransitionError();
-
-    // UPDATEが成功した時点で遷移前の値は expectedStatus だったことが保証される。
-    const { error: eventError } = await c.from("application_events").insert({
-      application_id: applicationId,
-      field,
-      from_status: expectedStatus,
-      to_status: toStatus,
-      actor_address: normalizeAddress(actorAddress),
-      reason: reason ?? null,
-      tx_id: txId ?? null,
+    // 条件付きUPDATEと監査イベントのINSERTをPostgres関数側で1トランザクションにする。
+    // 別々に発行すると、UPDATE成功後にINSERTが失敗したときUPDATEが巻き戻らず、
+    // 状態だけが変わって監査ログが残らない(Issue #21)。
+    const { data, error } = await client().rpc("transition_application", {
+      p_application_id: applicationId,
+      p_field: field,
+      p_to_status: toStatus,
+      p_expected_status: expectedStatus,
+      p_actor_address: normalizeAddress(actorAddress),
+      p_reason: reason ?? null,
+      p_tx_id: txId ?? null,
     });
-    if (eventError) throw eventError;
+    if (error) throw error;
+    // 0行更新のとき関数はNULLを返す。検証時から状態が変わっていたことを意味する。
+    if (!data) throw new ConcurrentTransitionError();
   },
 };
 
