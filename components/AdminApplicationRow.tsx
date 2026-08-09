@@ -94,8 +94,10 @@ export function AdminApplicationRow({ application }: { application: ApplicationW
               </button>
             </>
           )}
+          {/* 完了状態(added / sent)に達するまでは、何度失敗しても記録できる(Issue #20)。
+              完了ボタンの表示条件と同じ形にして、成功と失敗の記録が常に対になるようにする。 */}
           {review === "approved" &&
-            (application.allowlistStatus === "pending" || application.distributionStatus === "pending") && (
+            (application.allowlistStatus !== "added" || application.distributionStatus !== "sent") && (
               <>
                 <label className="flex items-center gap-2 text-sm font-semibold text-muted">
                   <span className="sr-only">失敗理由</span>
@@ -107,7 +109,7 @@ export function AdminApplicationRow({ application }: { application: ApplicationW
                     placeholder="失敗理由（失敗として記録する場合）"
                   />
                 </label>
-                {application.allowlistStatus === "pending" && (
+                {application.allowlistStatus !== "added" && (
                   <button
                     className={buttonStyles.quiet}
                     type="button"
@@ -117,7 +119,7 @@ export function AdminApplicationRow({ application }: { application: ApplicationW
                     Allowlist 失敗として記録
                   </button>
                 )}
-                {application.distributionStatus === "pending" && (
+                {application.distributionStatus !== "sent" && (
                   <button
                     className={buttonStyles.quiet}
                     type="button"

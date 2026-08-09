@@ -269,6 +269,46 @@ describe("transitionApplication", () => {
     );
   });
 
+  // 再試行がまた失敗したときの理由を残せるようにする(Issue #20)。
+  // 遷移前の値が failed なので expectedStatus も failed になる。
+  it("records a repeated failure with the new reason", async () => {
+    listAllMock.mockResolvedValue([
+      application({ reviewStatus: "approved", allowlistStatus: "failed" }),
+    ]);
+
+    const result = await transitionApplication({
+      applicationId: "a1",
+      field: "allowlist",
+      toStatus: "failed",
+      reason: "2回目: nonceが競合した",
+    });
+
+    expect(result).toEqual({ ok: true });
+    expect(transitionMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        field: "allowlist",
+        toStatus: "failed",
+        expectedStatus: "failed",
+        reason: "2回目: nonceが競合した",
+      }),
+    );
+  });
+
+  it("still requires a reason for a repeated failure", async () => {
+    listAllMock.mockResolvedValue([
+      application({ reviewStatus: "approved", distributionStatus: "failed" }),
+    ]);
+
+    const result = await transitionApplication({
+      applicationId: "a1",
+      field: "distribution",
+      toStatus: "failed",
+    });
+
+    expect(result).toEqual({ ok: false, error: "失敗理由を入力してください" });
+    expect(transitionMock).not.toHaveBeenCalled();
+  });
+
   it("returns an error for an unknown application id", async () => {
     listAllMock.mockResolvedValue([]);
 

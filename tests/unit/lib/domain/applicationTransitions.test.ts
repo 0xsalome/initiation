@@ -52,6 +52,32 @@ describe("validateTransition", () => {
     ).toBe(false);
   });
 
+  // 再試行がまた失敗したときの理由を監査ログへ残せるようにする(Issue #20)。
+  it("allows recording a repeated allowlist failure", () => {
+    expect(
+      validateTransition(app({ reviewStatus: "approved", allowlistStatus: "failed" }), "allowlist", "failed"),
+    ).toEqual({ ok: true });
+  });
+
+  it("allows recording a repeated distribution failure", () => {
+    expect(
+      validateTransition(app({ reviewStatus: "approved", distributionStatus: "failed" }), "distribution", "failed"),
+    ).toEqual({ ok: true });
+  });
+
+  // 完了状態の保護は維持する。added / sent から failed へは戻せない。
+  it("forbids recording a failure after allowlist is added", () => {
+    expect(
+      validateTransition(app({ reviewStatus: "approved", allowlistStatus: "added" }), "allowlist", "failed").ok,
+    ).toBe(false);
+  });
+
+  it("still forbids a repeated failure before approval", () => {
+    expect(
+      validateTransition(app({ reviewStatus: "pending", allowlistStatus: "failed" }), "allowlist", "failed").ok,
+    ).toBe(false);
+  });
+
   it("rejects an unknown status value", () => {
     expect(validateTransition(app(), "review", "banana").ok).toBe(false);
   });

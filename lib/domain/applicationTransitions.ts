@@ -9,15 +9,19 @@ const REVIEW_TRANSITIONS: Record<string, string[]> = {
   rejected: [],
 };
 
+// failed -> failed を許可しているのは、再試行がまた失敗したときの理由を
+// application_events へ残せるようにするため(Issue #20)。状態は変わらないが、
+// 「何回どう失敗したか」は追記型の監査ログにしか属さない情報で、Allowlist追加と
+// HENKAKU配布は人手のオンチェーン操作なのでこの履歴が唯一の裏付けになる。
 const EXECUTION_TRANSITIONS: Record<string, Record<string, string[]>> = {
   allowlist: {
     pending: ["added", "failed"],
-    failed: ["added"],
+    failed: ["added", "failed"],
     added: [],
   },
   distribution: {
     pending: ["sent", "failed"],
-    failed: ["sent"],
+    failed: ["sent", "failed"],
     sent: [],
   },
 };
