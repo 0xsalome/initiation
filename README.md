@@ -102,7 +102,7 @@ npx tsc --noEmit
 5. 変更理由、検証内容、未解決の判断をPull Requestに書く
 6. UI変更はスクリーンショットまたは手動確認手順を添える
 
-判断が必要な事項は勝手に仕様化せず、`docs/decisions.md` に日付付きで記録してから実装します。Next.jsの変更を行うときは、リポジトリの `AGENTS.md` と `node_modules/next/dist/docs/` の該当ガイドを確認してください。
+判断が必要な事項は勝手に仕様化せず、`docs/decisions/` に1決定1ファイルで記録してから実装します。命名規則は [決定事項の読み方](docs/decisions.md) を参照してください。Next.jsの変更を行うときは、リポジトリの `AGENTS.md` と `node_modules/next/dist/docs/` の該当ガイドを確認してください。
 
 ## 現在の制約と次の計画
 
@@ -112,7 +112,7 @@ npx tsc --noEmit
 - Vercel / Supabase本番環境へのデプロイは延期中です
 - 本番公開前にプライバシー方針とライセンスを確定してください（現時点でLICENSEファイルは未設定です）
 
-全体計画は [docs/development-plan.md](docs/development-plan.md)、実装計画は [docs/superpowers/plans/2026-08-06-phase1-initiation-mvp1.md](docs/superpowers/plans/2026-08-06-phase1-initiation-mvp1.md)、決定事項は [docs/decisions.md](docs/decisions.md) にあります。
+全体計画は [docs/development-plan.md](docs/development-plan.md)、実装計画は [docs/superpowers/plans/2026-08-06-phase1-initiation-mvp1.md](docs/superpowers/plans/2026-08-06-phase1-initiation-mvp1.md)、決定事項は [docs/decisions.md](docs/decisions.md) から参照できます。
 
 ## ライセンス
 
