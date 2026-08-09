@@ -16,7 +16,8 @@ HENKAKUコミュニティへの参加を、ウォレット準備からInitiation
 
 ## 開発環境
 
-- Node.js 20.9 以上 / npm（開発時の確認は Node.js 24 系）。バージョン管理ツールは各自の好みで構いません
+- Node.js 22.0.0 以上 / npm（開発時の確認は Node.js 24 系）。バージョン管理ツールは各自の好みで構いません
+  - `@supabase/supabase-js` などが `engines.node >=22.0.0` を要求します。Node.js 20 では `npm install` が `EBADENGINE` を出し、build・テストでも警告が出ます
 - Next.js App Router / TypeScript
 - wagmi + viem: ウォレット接続、Polygon切替、`wallet_watchAsset`
 - SIWE + iron-session: ウォレット署名認証とセッション
