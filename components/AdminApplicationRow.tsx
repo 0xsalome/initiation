@@ -4,13 +4,27 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import type { ReasonByField } from "@/lib/domain/applicationEvents";
 import type { ApplicationWithMember, StatusField } from "@/lib/domain/types";
 import { transitionApplication } from "@/app/admin/actions";
 import { buttonStyles, inputStyles } from "@/lib/ui";
 
-export function AdminApplicationRow({ application }: { application: ApplicationWithMember }) {
+const REASON_FIELD_LABELS: Record<StatusField, string> = {
+  review: "審査",
+  allowlist: "Allowlist",
+  distribution: "配布",
+};
+
+export function AdminApplicationRow({
+  application,
+  reasons = {},
+}: {
+  application: ApplicationWithMember;
+  reasons?: ReasonByField;
+}) {
   const [error, setError] = useState<string | null>(null);
   const [txId, setTxId] = useState("");
+  const [reviewReason, setReviewReason] = useState("");
   const [failureReason, setFailureReason] = useState("");
   const [pending, startTransition] = useTransition();
   const router = useRouter();
@@ -33,6 +47,9 @@ export function AdminApplicationRow({ application }: { application: ApplicationW
   }
 
   const review = application.reviewStatus;
+  const recordedReasons = (Object.keys(REASON_FIELD_LABELS) as StatusField[])
+    .map((field) => [field, reasons[field]] as const)
+    .filter((entry): entry is [StatusField, NonNullable<(typeof entry)[1]>] => Boolean(entry[1]));
 
   return (
     <tr className="align-top">
@@ -52,16 +69,33 @@ export function AdminApplicationRow({ application }: { application: ApplicationW
             <button className={buttonStyles.primary} type="button" disabled={pending} onClick={() => run("review", "approved")}>
               承認
             </button>
+            {/* 却下と要追加情報は理由が申請者へそのまま表示される(Issue #19)。
+                承認は理由を使わないため、入力欄はこの2つの操作の隣に置く。 */}
+            <label className="flex items-center gap-2 text-sm font-semibold text-muted">
+              <span className="sr-only">却下・要追加情報の理由</span>
+              <input
+                className={`${inputStyles} inline-block w-64 text-sm`}
+                type="text"
+                value={reviewReason}
+                onChange={(event) => setReviewReason(event.target.value)}
+                placeholder="理由（申請者に表示）"
+              />
+            </label>
             <button
               className={buttonStyles.secondary}
               type="button"
               disabled={pending}
-              onClick={() => run("review", "rejected", { reason: "運営判断" })}
+              onClick={() => run("review", "rejected", { reason: reviewReason })}
             >
               却下
             </button>
             {review === "pending" && (
-              <button className={buttonStyles.quiet} type="button" disabled={pending} onClick={() => run("review", "needs_info")}>
+              <button
+                className={buttonStyles.quiet}
+                type="button"
+                disabled={pending}
+                onClick={() => run("review", "needs_info", { reason: reviewReason })}
+              >
                 要追加情報
               </button>
             )}
@@ -132,6 +166,23 @@ export function AdminApplicationRow({ application }: { application: ApplicationW
               </>
             )}
         </div>
+        {/* 記録済みの理由。applications.reason は直近の1件で上書きされるため、
+            application_events から field ごとの最新を受け取って表示する(Issue #19)。 */}
+        {recordedReasons.length > 0 && (
+          <dl className="mt-3 space-y-1 border-t border-border pt-3 text-sm">
+            {recordedReasons.map(([field, event]) => (
+              <div key={field} className="grid gap-1 sm:grid-cols-[7rem_1fr] sm:gap-3">
+                <dt className="font-semibold text-muted">{REASON_FIELD_LABELS[field]}の理由</dt>
+                <dd className="text-foreground">
+                  {event.reason}
+                  <small className="ml-2 text-muted">
+                    （{event.toStatus} / {new Date(event.createdAt).toLocaleString("ja-JP")}）
+                  </small>
+                </dd>
+              </div>
+            ))}
+          </dl>
+        )}
         {error && <p className="mt-3 text-sm font-semibold text-rose-600 dark:text-rose-300" role="alert">{error}</p>}
       </td>
     </tr>

@@ -7,7 +7,7 @@ import { useState, useTransition } from "react";
 import { submitApplication } from "@/app/apply/actions";
 import { buttonStyles } from "@/lib/ui";
 
-export function ApplyForm() {
+export function ApplyForm({ reapply = false }: { reapply?: boolean }) {
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
@@ -30,7 +30,7 @@ export function ApplyForm() {
         申請すると運営メンバーが内容を確認し、Allowlist追加とHENKAKUの送付を手作業で行います。
       </p>
       <button className={`${buttonStyles.primary} mt-5`} type="button" disabled={pending} onClick={submit}>
-        {pending ? "申請中…" : "申請する"}
+        {pending ? "申請中…" : reapply ? "もう一度申請する" : "申請する"}
       </button>
       {error && <p className="mt-3 text-sm font-semibold text-rose-600 dark:text-rose-300" role="alert">{error}</p>}
     </section>

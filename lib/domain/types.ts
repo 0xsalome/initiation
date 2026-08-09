@@ -31,6 +31,22 @@ export type Application = {
   updatedAt: string;
 };
 
+/**
+ * 状態遷移1回の記録。`applications.reason` は直近の理由で上書きされるため、
+ * 「どの操作にどの理由が付いたか」はこちらが正本になる(Issue #19)。
+ */
+export type ApplicationEvent = {
+  id: string;
+  applicationId: string;
+  field: StatusField;
+  fromStatus: string | null;
+  toStatus: string;
+  actorAddress: Address;
+  reason: string | null;
+  txId: string | null;
+  createdAt: string;
+};
+
 export type ApplicationWithMember = Application & {
   walletAddress: Address;
   displayName: string | null;

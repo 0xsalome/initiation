@@ -43,6 +43,17 @@ export async function transitionApplication(params: {
       return { ok: false, error: "失敗理由を入力してください" };
     }
 
+    // 却下・要追加情報は申請者へ伝える内容そのものなので理由を必須にする。
+    // 承認は理由がなくても後から状態で追えるため必須にしない(Issue #19)。
+    if (params.field === "review" && !reason) {
+      if (params.toStatus === "rejected") {
+        return { ok: false, error: "却下理由を入力してください" };
+      }
+      if (params.toStatus === "needs_info") {
+        return { ok: false, error: "必要な追加情報を入力してください" };
+      }
+    }
+
     await repositories.applications.transition({
       applicationId: params.applicationId,
       field: params.field,

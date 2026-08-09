@@ -99,6 +99,95 @@ describe("transitionApplication", () => {
     expect(transitionMock).not.toHaveBeenCalled();
   });
 
+  it("requires a reason when rejecting", async () => {
+    listAllMock.mockResolvedValue([application()]);
+
+    const result = await transitionApplication({
+      applicationId: "a1",
+      field: "review",
+      toStatus: "rejected",
+    });
+
+    expect(result).toEqual({ ok: false, error: "却下理由を入力してください" });
+    expect(transitionMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects a whitespace-only rejection reason", async () => {
+    listAllMock.mockResolvedValue([application()]);
+
+    const result = await transitionApplication({
+      applicationId: "a1",
+      field: "review",
+      toStatus: "rejected",
+      reason: "   ",
+    });
+
+    expect(result.ok).toBe(false);
+    expect(transitionMock).not.toHaveBeenCalled();
+  });
+
+  it("records a rejection with the trimmed reason", async () => {
+    listAllMock.mockResolvedValue([application()]);
+
+    const result = await transitionApplication({
+      applicationId: "a1",
+      field: "review",
+      toStatus: "rejected",
+      reason: "  チェックイン履歴が見当たりませんでした  ",
+    });
+
+    expect(result.ok).toBe(true);
+    expect(transitionMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        field: "review",
+        toStatus: "rejected",
+        reason: "チェックイン履歴が見当たりませんでした",
+      }),
+    );
+  });
+
+  it("requires a reason when asking for more information", async () => {
+    listAllMock.mockResolvedValue([application()]);
+
+    const result = await transitionApplication({
+      applicationId: "a1",
+      field: "review",
+      toStatus: "needs_info",
+    });
+
+    expect(result).toEqual({ ok: false, error: "必要な追加情報を入力してください" });
+    expect(transitionMock).not.toHaveBeenCalled();
+  });
+
+  it("records needs_info with the reason", async () => {
+    listAllMock.mockResolvedValue([application()]);
+
+    const result = await transitionApplication({
+      applicationId: "a1",
+      field: "review",
+      toStatus: "needs_info",
+      reason: "Discordのハンドルを教えてください",
+    });
+
+    expect(result.ok).toBe(true);
+    expect(transitionMock).toHaveBeenCalledWith(
+      expect.objectContaining({ toStatus: "needs_info", reason: "Discordのハンドルを教えてください" }),
+    );
+  });
+
+  it("does not require a reason to approve", async () => {
+    listAllMock.mockResolvedValue([application()]);
+
+    const result = await transitionApplication({
+      applicationId: "a1",
+      field: "review",
+      toStatus: "approved",
+    });
+
+    expect(result.ok).toBe(true);
+    expect(transitionMock).toHaveBeenCalledWith(expect.objectContaining({ reason: undefined }));
+  });
+
   it("requires txId when marking distribution as sent", async () => {
     listAllMock.mockResolvedValue([application({ reviewStatus: "approved" })]);
 
