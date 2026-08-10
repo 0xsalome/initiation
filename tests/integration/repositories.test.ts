@@ -71,9 +71,8 @@ describe("repositories (local supabase)", () => {
       reason: "チェックイン履歴が見当たりませんでした",
     });
 
-    // 重複申請の判定(findActiveByMember)は却下を除外したままにする。
-    expect(await applications.findActiveByMember(m.id)).toBeNull();
-    // 申請者へ結果を伝えるための経路は却下を返す。
+    // 申請者へ結果を伝えるための経路は却下を返す。却下が重複判定の対象外である
+    // ことは "allows re-application after rejection" が押さえている。
     const latest = await applications.findLatestByMember(m.id);
     expect(latest?.id).toBe(app.id);
     expect(latest?.reviewStatus).toBe("rejected");

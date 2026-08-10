@@ -7,6 +7,7 @@ import { Fragment, useState, useTransition } from "react";
 import type { EventByField } from "@/lib/domain/applicationEvents";
 import type { ApplicationWithMember, StatusField } from "@/lib/domain/types";
 import { transitionApplication } from "@/app/admin/actions";
+import { formatJst } from "@/lib/datetime";
 import { buttonStyles, inputStyles } from "@/lib/ui";
 
 const FIELD_LABELS: Record<StatusField, string> = {
@@ -203,7 +204,7 @@ export function AdminApplicationRow({
                     <dd className="text-foreground">
                       {reason.reason}
                       <small className="ml-2 text-muted">
-                        （{reason.toStatus} / {new Date(reason.createdAt).toLocaleString("ja-JP")}）
+                        （{reason.toStatus} / {formatJst(reason.createdAt)}）
                       </small>
                     </dd>
                   </div>
@@ -214,7 +215,7 @@ export function AdminApplicationRow({
                     <dd className="break-all font-mono text-xs text-foreground">
                       {tx.txId}
                       <small className="ml-2 font-sans text-muted">
-                        （{new Date(tx.createdAt).toLocaleString("ja-JP")}）
+                        （{formatJst(tx.createdAt)}）
                       </small>
                     </dd>
                   </div>

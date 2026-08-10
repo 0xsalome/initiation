@@ -16,7 +16,8 @@
 
 `ApplicationRepository` に `findLatestByMember` を追加し、`/apply` はこちらを使う。却下済みも含めた直近の申請を返す。
 
-- **`findActiveByMember` は変更しない。** これは重複申請の判定(`applications_active_per_member` は `rejected` を対象外にしている)に対応する契約で、ここを変えると再申請ができなくなる。用途が違うので別メソッドに分けた。
+- **`findActiveByMember` は削除した。** 当初は「重複申請の判定に使う契約」として残す判断だったが、レビューで**このPR適用後は本番コードからの呼び出しがゼロになる**ことを指摘された(#32)。実際の重複防止は DB の一意インデックス `applications_active_per_member` に反した `create` が `DuplicateApplicationError` を投げることで担っており、このメソッドは判定に関与していない。契約でないものを契約として残すと、次に読む人が重複防止の実体を取り違える。
+- 却下が重複判定の対象外であることは、統合テストの `prevents duplicate active applications` と `allows re-application after rejection` が `create` の挙動として押さえている。`findActiveByMember` の有無に依存しない。
 - 却下時は Allowlist と配布の行を隠し、「もう一度申請できます」と再申請ボタンを出す。見送りになった申請でこの2つの状態を見せても意味がないため。
 - 却下・要追加情報の理由のみ表示する。Allowlist・配布の失敗理由は申請者側で対処できないため従来どおり「運営が対応中です」に留める(`lib/applicationLabels.ts`)。
 
