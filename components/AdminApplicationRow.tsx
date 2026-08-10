@@ -7,6 +7,7 @@ import { useState, useTransition } from "react";
 import type { ReasonByField } from "@/lib/domain/applicationEvents";
 import type { ApplicationWithMember, StatusField } from "@/lib/domain/types";
 import { transitionApplication } from "@/app/admin/actions";
+import { formatJst } from "@/lib/datetime";
 import { buttonStyles, inputStyles } from "@/lib/ui";
 
 const REASON_FIELD_LABELS: Record<StatusField, string> = {
@@ -176,7 +177,7 @@ export function AdminApplicationRow({
                 <dd className="text-foreground">
                   {event.reason}
                   <small className="ml-2 text-muted">
-                    （{event.toStatus} / {new Date(event.createdAt).toLocaleString("ja-JP")}）
+                    （{event.toStatus} / {formatJst(event.createdAt)}）
                   </small>
                 </dd>
               </div>

@@ -24,11 +24,10 @@ export interface ProgressRepository {
 }
 
 export interface ApplicationRepository {
-  /** 却下済みを除いた申請。重複申請の判定に使う。 */
-  findActiveByMember(memberId: string): Promise<Application | null>;
   /**
    * 却下済みも含めた直近の申請。申請者へ却下の結果を伝えるために使う。
-   * `findActiveByMember` と分けてあるのは、重複申請の判定を変えないため(Issue #19)。
+   * 重複申請の判定はここではなく、`create` が返す DuplicateApplicationError
+   * (DBの一意インデックス applications_active_per_member)が担う。
    */
   findLatestByMember(memberId: string): Promise<Application | null>;
   create(memberId: string): Promise<Application>;

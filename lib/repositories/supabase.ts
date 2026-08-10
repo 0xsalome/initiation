@@ -145,17 +145,6 @@ const VALID_STATUS_FIELDS: Record<StatusField, true> = {
 };
 
 const applications: ApplicationRepository = {
-  async findActiveByMember(memberId) {
-    const { data, error } = await client()
-      .from("applications")
-      .select("*")
-      .eq("member_id", memberId)
-      .neq("review_status", "rejected")
-      .maybeSingle();
-    if (error) throw error;
-    return data ? toApplication(data as Row) : null;
-  },
-
   async findLatestByMember(memberId) {
     // 却下済みは member あたり複数行あり得る(applications_active_per_member は
     // rejected を対象外にしている)ため、maybeSingle ではなく最新の1件を取る。
