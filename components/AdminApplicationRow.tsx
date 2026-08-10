@@ -3,27 +3,32 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
-import type { ReasonByField } from "@/lib/domain/applicationEvents";
+import { Fragment, useState, useTransition } from "react";
+import type { EventByField } from "@/lib/domain/applicationEvents";
 import type { ApplicationWithMember, StatusField } from "@/lib/domain/types";
 import { transitionApplication } from "@/app/admin/actions";
 import { buttonStyles, inputStyles } from "@/lib/ui";
 
-const REASON_FIELD_LABELS: Record<StatusField, string> = {
+const FIELD_LABELS: Record<StatusField, string> = {
   review: "審査",
   allowlist: "Allowlist",
   distribution: "配布",
 };
 
+const FIELDS = Object.keys(FIELD_LABELS) as StatusField[];
+
 export function AdminApplicationRow({
   application,
   reasons = {},
+  txIds = {},
 }: {
   application: ApplicationWithMember;
-  reasons?: ReasonByField;
+  reasons?: EventByField;
+  txIds?: EventByField;
 }) {
   const [error, setError] = useState<string | null>(null);
   const [txId, setTxId] = useState("");
+  const [allowlistTxId, setAllowlistTxId] = useState("");
   const [reviewReason, setReviewReason] = useState("");
   const [failureReason, setFailureReason] = useState("");
   const [pending, startTransition] = useTransition();
@@ -47,9 +52,9 @@ export function AdminApplicationRow({
   }
 
   const review = application.reviewStatus;
-  const recordedReasons = (Object.keys(REASON_FIELD_LABELS) as StatusField[])
-    .map((field) => [field, reasons[field]] as const)
-    .filter((entry): entry is [StatusField, NonNullable<(typeof entry)[1]>] => Boolean(entry[1]));
+  const recorded = FIELDS.map((field) => ({ field, reason: reasons[field], tx: txIds[field] })).filter(
+    (entry) => entry.reason || entry.tx,
+  );
 
   return (
     <tr className="align-top">
@@ -102,9 +107,28 @@ export function AdminApplicationRow({
             </>
           )}
           {review === "approved" && application.allowlistStatus !== "added" && (
-            <button className={buttonStyles.secondary} type="button" disabled={pending} onClick={() => run("allowlist", "added")}>
-              Allowlist 追加済みにする
-            </button>
+            <>
+              {/* Allowlist追加もオンチェーン操作なので、配布と同じくtx hashを確認記録として残す。
+                  これがないとRunbookが求めるとおり運用ログへ手で書き写すことになる(Issue #33)。 */}
+              <label className="flex items-center gap-2 text-sm font-semibold text-muted">
+                <span className="sr-only">Allowlist tx hash</span>
+                <input
+                  className={`${inputStyles} inline-block w-64 text-sm`}
+                  type="text"
+                  value={allowlistTxId}
+                  onChange={(event) => setAllowlistTxId(event.target.value)}
+                  placeholder="Allowlist tx hash（0x…）"
+                />
+              </label>
+              <button
+                className={buttonStyles.secondary}
+                type="button"
+                disabled={pending}
+                onClick={() => run("allowlist", "added", { txId: allowlistTxId })}
+              >
+                Allowlist 追加済みにする
+              </button>
+            </>
           )}
           {review === "approved" && application.distributionStatus !== "sent" && (
             <>
@@ -166,20 +190,36 @@ export function AdminApplicationRow({
               </>
             )}
         </div>
-        {/* 記録済みの理由。applications.reason は直近の1件で上書きされるため、
-            application_events から field ごとの最新を受け取って表示する(Issue #19)。 */}
-        {recordedReasons.length > 0 && (
+        {/* 記録済みの理由と tx hash。applications 側の列は直近の1件で上書きされ、
+            Allowlist の tx hash に至っては列自体がないため、いずれも
+            application_events から field ごとの最新を受け取って表示する(Issue #19, #33)。 */}
+        {recorded.length > 0 && (
           <dl className="mt-3 space-y-1 border-t border-border pt-3 text-sm">
-            {recordedReasons.map(([field, event]) => (
-              <div key={field} className="grid gap-1 sm:grid-cols-[7rem_1fr] sm:gap-3">
-                <dt className="font-semibold text-muted">{REASON_FIELD_LABELS[field]}の理由</dt>
-                <dd className="text-foreground">
-                  {event.reason}
-                  <small className="ml-2 text-muted">
-                    （{event.toStatus} / {new Date(event.createdAt).toLocaleString("ja-JP")}）
-                  </small>
-                </dd>
-              </div>
+            {recorded.map(({ field, reason, tx }) => (
+              <Fragment key={field}>
+                {reason && (
+                  <div className="grid gap-1 sm:grid-cols-[7rem_1fr] sm:gap-3">
+                    <dt className="font-semibold text-muted">{FIELD_LABELS[field]}の理由</dt>
+                    <dd className="text-foreground">
+                      {reason.reason}
+                      <small className="ml-2 text-muted">
+                        （{reason.toStatus} / {new Date(reason.createdAt).toLocaleString("ja-JP")}）
+                      </small>
+                    </dd>
+                  </div>
+                )}
+                {tx && (
+                  <div className="grid gap-1 sm:grid-cols-[7rem_1fr] sm:gap-3">
+                    <dt className="font-semibold text-muted">{FIELD_LABELS[field]}の tx hash</dt>
+                    <dd className="break-all font-mono text-xs text-foreground">
+                      {tx.txId}
+                      <small className="ml-2 font-sans text-muted">
+                        （{new Date(tx.createdAt).toLocaleString("ja-JP")}）
+                      </small>
+                    </dd>
+                  </div>
+                )}
+              </Fragment>
             ))}
           </dl>
         )}

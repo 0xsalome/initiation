@@ -32,9 +32,17 @@ export async function transitionApplication(params: {
       return { ok: false, error: validation.reason };
     }
 
+    // 完了として記録する操作は、対応するオンチェーン取引の確認記録を必ず残す。
+    // Allowlist追加もコントラクト操作なのでtx hashが出る(Runbook「3. Allowlistへ追加する」)。
+    // 配布と扱いを揃え、運用ログ側へ書き写す必要をなくす(Issue #33)。
     const txId = params.txId?.trim();
-    if (params.field === "distribution" && params.toStatus === "sent" && !txId) {
-      return { ok: false, error: "トランザクションIDを入力してください" };
+    if (!txId) {
+      if (params.field === "distribution" && params.toStatus === "sent") {
+        return { ok: false, error: "トランザクションIDを入力してください" };
+      }
+      if (params.field === "allowlist" && params.toStatus === "added") {
+        return { ok: false, error: "Allowlist追加のトランザクションIDを入力してください" };
+      }
     }
 
     // 失敗の記録は再試行の判断材料になるため、Runbookどおり理由を必須にする。
