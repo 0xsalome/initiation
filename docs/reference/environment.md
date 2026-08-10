@@ -11,6 +11,7 @@
 | 変数 | 用途 | 公開可否 |
 | --- | --- | --- |
 | `SESSION_PASSWORD` | セッション暗号化。32文字以上が必須 | 非公開 |
+| `SIWE_ALLOWED_DOMAINS` | SIWE署名を受け付けるドメイン（カンマ区切り） | 公開可・既定値あり |
 | `SUPABASE_URL` | Supabaseの接続先 | 環境による |
 | `SUPABASE_SERVICE_ROLE_KEY` | サーバー側Repositoryの接続 | 非公開 |
 | `ADMIN_ADDRESSES` | 管理画面を使えるウォレット（カンマ区切り） | アドレス自体は公開情報だが環境変数で管理 |
@@ -34,6 +35,22 @@ openssl rand -base64 32
 ```
 
 未設定または32文字未満の場合、`SESSION_PASSWORD must be at least 32 characters` が発生します。
+
+### SIWE_ALLOWED_DOMAINS
+
+SIWEの署名メッセージに書かれた `domain` が、このリストに含まれるときだけサインインを受け付けます。ブラウザが送る `Host` ヘッダーではなくこの設定値と比較するため、**別のサイト向けに作られた署名を受け付けません。**
+
+```
+SIWE_ALLOWED_DOMAINS=localhost:3000
+```
+
+`.env.example` に `localhost:3000` が入っているので、通常のローカル開発では変更不要です。
+
+- ポートを含めて書きます（ブラウザの `location.host` と同じ形式です）
+- カンマ区切りで複数指定できます。大文字小文字は区別されません
+- **未設定だとサインインは必ず失敗します**（`domain not configured`）。設定漏れが「誰でも通る」側に倒れないようにするためです
+
+`npm run dev -- --port 3001` のように別のポートで動かす場合は、そのポートを含む値へ変更してください。
 
 ### SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY
 
