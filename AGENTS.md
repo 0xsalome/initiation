@@ -7,6 +7,7 @@ HENKAKU Initiation。docs/development-plan.md が全体計画、docs/superpowers
 - 環境変数は .env.local(コミット禁止)。変数名一覧は .env.example
 - 決定事項は `docs/decisions/` に1決定1ファイルで記録。命名規則は `docs/decisions.md` を参照
 - CI: PRとmainへのpushで `.github/workflows/ci.yml` が検証コマンドを実行する
+- 依存更新: Dependabotの更新PRは、CIが緑でも自動マージしない。ウォレット・ブラウザ依存のフローはCIの対象外なので、`wagmi` / `viem` / `next` を含む更新は `/setup` の接続と署名を手で確認してからマージする(`docs/decisions/2026-08-10-dependency-updates.md`)
 
 ## ページ構成
 
