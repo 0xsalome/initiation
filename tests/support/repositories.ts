@@ -15,4 +15,7 @@ export async function truncateAll() {
     const { error } = await client.from(table).delete().neq("id", "00000000-0000-0000-0000-000000000000");
     if (error) throw error;
   }
+  // rate_limits は主キーが (bucket, subject) で id 列を持たないため、別の条件で消す。
+  const { error } = await client.from("rate_limits").delete().neq("bucket", "");
+  if (error) throw error;
 }

@@ -3,12 +3,14 @@
 "use server";
 
 import { currentStatus, validateTransition } from "@/lib/domain/applicationTransitions";
+import { rateLimitMessage, rateLimitRules } from "@/lib/domain/rateLimits";
 import type { StatusField } from "@/lib/domain/types";
 import {
   ForbiddenError,
   requireAdmin,
   UnauthenticatedError,
 } from "@/lib/auth/guards";
+import { consumeRateLimit, RateLimitedError } from "@/lib/auth/rateLimit";
 import { ConcurrentTransitionError, getRepositories } from "@/lib/repositories";
 
 export async function transitionApplication(params: {
@@ -20,6 +22,10 @@ export async function transitionApplication(params: {
 }): Promise<{ ok: boolean; error?: string }> {
   try {
     const { address } = await requireAdmin();
+    // 一覧の取得より前に数える。遷移ルールに弾かれる呼び出しも
+    // 全申請の取得を伴うため、そこへ届く前に止める。
+    await consumeRateLimit(rateLimitRules.applicationTransition, address);
+
     const repositories = getRepositories();
     const applications = await repositories.applications.listAll();
     const application = applications.find((item) => item.id === params.applicationId);
@@ -56,6 +62,9 @@ export async function transitionApplication(params: {
   } catch (error) {
     if (error instanceof ForbiddenError || error instanceof UnauthenticatedError) {
       return { ok: false, error: "権限がありません" };
+    }
+    if (error instanceof RateLimitedError) {
+      return { ok: false, error: rateLimitMessage(error.rule) };
     }
     if (error instanceof ConcurrentTransitionError) {
       return {

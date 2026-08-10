@@ -18,6 +18,7 @@ import {
   type CheckinRepository,
   type MemberRepository,
   type ProgressRepository,
+  type RateLimitRepository,
   type Repositories,
 } from "./index";
 
@@ -241,9 +242,25 @@ const checkins: CheckinRepository = {
   },
 };
 
+const rateLimits: RateLimitRepository = {
+  async consume({ bucket, subject, limit, windowSeconds }) {
+    const { data, error } = await client().rpc("consume_rate_limit", {
+      p_bucket: bucket,
+      p_subject: subject,
+      p_limit: limit,
+      p_window_seconds: windowSeconds,
+    });
+    if (error) throw error;
+    // 判定はDB側で完結している。ここで data を数値と比較し直さないのは、
+    // 上限の解釈が2箇所に分かれると片方だけ直したときにずれるため。
+    return data === true;
+  },
+};
+
 export const supabaseRepositories: Repositories = {
   members,
   progress,
   applications,
   checkins,
+  rateLimits,
 };
