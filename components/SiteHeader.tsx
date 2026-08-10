@@ -1,7 +1,8 @@
 // ABOUTME: 全ページ共通のサイトヘッダーと参加フローのメニューを表示する。
 // ABOUTME: メンバー導線と運営導線を分け、初見でも次の操作を選べるようにする。
 import Link from "next/link";
-import { adminNavigation, mainNavigation } from "@/lib/navigation";
+import { SessionStatus } from "@/components/SessionStatus";
+import { mainNavigation } from "@/lib/navigation";
 
 export function SiteHeader() {
   return (
@@ -33,17 +34,10 @@ export function SiteHeader() {
               </li>
             ))}
           </ul>
+          {/* セッションに依存するのはこの部分だけ。ヘッダー自体はServer Componentのまま
+              にして、トップページなどが静的に描画できる状態を保つ(Issue #40)。 */}
           <ul className="ml-auto flex flex-wrap items-center gap-1">
-            {adminNavigation.map((item) => (
-              <li key={item.href}>
-                <Link
-                  className="inline-flex min-h-9 items-center rounded-lg border border-border px-2.5 py-2 text-sm font-semibold text-muted transition hover:bg-surface-hover hover:text-foreground focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-indigo-400"
-                  href={item.href}
-                >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
+            <SessionStatus />
           </ul>
         </nav>
       </div>
