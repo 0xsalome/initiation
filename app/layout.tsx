@@ -23,10 +23,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="ja" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
-        <SiteHeader />
-        <div className="mx-auto min-h-screen w-full max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-          <Providers>{children}</Providers>
-        </div>
+        {/* ヘッダーがセッションを参照するため、Providers の内側へ入れる。
+            SiteHeader 自体はServer Componentのまま子として渡される(Issue #40)。 */}
+        <Providers>
+          <SiteHeader />
+          <div className="mx-auto min-h-screen w-full max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+            {children}
+          </div>
+        </Providers>
       </body>
     </html>
   );
