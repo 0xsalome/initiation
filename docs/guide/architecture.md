@@ -69,7 +69,7 @@
 
 期限は**サーバー側でも効きます**。Cookieの `Max-Age` だけでなく、暗号化されたデータ自体が期限を持っていて、期限切れのCookieを送ってもサーバーは「サインインしていない」として扱います。切れたときは `requireMember()` が `UnauthenticatedError` になり、各ページはサインインを促す表示に戻ります。
 
-`POST /api/auth/logout` はセッションを破棄します。ウォレットのアカウントやチェーンが変わったときに、画面側から自動で呼ばれます。
+`POST /api/auth/logout` はセッションを破棄します。ヘッダーのサインアウトから呼ぶほか、`/setup` を開いている間にウォレットのアカウントやチェーンが変わったときも画面側から自動で呼ばれます。この自動破棄は `components/SignInWithEthereum.tsx` にあり、このコンポーネントを置いているのは `/setup` だけなので、**他のページを開いている間の切り替えは検知されません**（[Issue #44](https://github.com/henkaku-center/initiation/issues/44)）。
 
 ### 認可ガード
 
