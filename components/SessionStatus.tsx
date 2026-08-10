@@ -7,12 +7,18 @@ import { useState } from "react";
 import { shortenAddress } from "@/lib/domain/address";
 import { adminNavigation } from "@/lib/navigation";
 import { buttonStyles } from "@/lib/ui";
-import { useRefreshSession, useSession } from "@/lib/useSession";
+import { useSession, useSignOut } from "@/lib/useSession";
+import { useSignOutOnAccountChange } from "@/lib/useWalletSessionGuard";
 
 export function SessionStatus() {
   const { data: session, isPending } = useSession();
-  const refreshSession = useRefreshSession();
+  const discardSession = useSignOut();
   const [signingOut, setSigningOut] = useState(false);
+
+  // ウォレットのずれの検知をここへ置くのは、このコンポーネントだけが
+  // ルートレイアウト経由で全ページに乗るため(Issue #44)。表示を出さない状態
+  // (取得中・未サインイン)でも検知は動かす必要があるので、早期returnより前に呼ぶ。
+  useSignOutOnAccountChange(session?.address ?? null);
 
   // セッションを確かめる前は何も出さない。未サインインの表示を一瞬見せてから
   // 差し替えると、サインイン済みの人には状態が揺れて見えるため。
@@ -21,8 +27,7 @@ export function SessionStatus() {
   async function signOut() {
     setSigningOut(true);
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
-      await refreshSession();
+      await discardSession();
     } finally {
       setSigningOut(false);
     }

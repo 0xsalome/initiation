@@ -26,6 +26,10 @@ function sessionOptions(): SessionOptions {
     password,
     ttl: SESSION_TTL_SECONDS,
     cookieName: "initiation_session",
+    // maxAge はここへ足さない。iron-session は cookieOptions に maxAge キーが
+    // あると ttl からの算出をやめるため、Cookie の寿命が SESSION_TTL_SECONDS から
+    // 外れる。`maxAge: undefined` を明示した場合はさらに ttl が 0 として扱われ、
+    // 実質無期限になる(PR #42 のレビュー指摘)。
     cookieOptions: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",

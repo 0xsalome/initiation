@@ -33,3 +33,21 @@ export function useRefreshSession(): () => Promise<void> {
     await queryClient.invalidateQueries({ queryKey: sessionQueryKey });
   }, [queryClient]);
 }
+
+/**
+ * サーバーのセッションを破棄して、画面の表示を合わせ直す。
+ * 明示的なサインアウトと、ウォレットのずれを検知したときの両方から使う(Issue #44)。
+ *
+ * 破棄に失敗しても再取得だけは行う。表示だけサインイン済みのまま残すと、
+ * 押せるはずの操作が弾かれる状態になるため。
+ */
+export function useSignOut(): () => Promise<void> {
+  const refreshSession = useRefreshSession();
+  return useCallback(async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } finally {
+      await refreshSession();
+    }
+  }, [refreshSession]);
+}

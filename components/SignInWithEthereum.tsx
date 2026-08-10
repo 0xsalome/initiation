@@ -1,4 +1,4 @@
-// ABOUTME: SIWE サインイン。アカウント/チェーン変更を検知したらサーバーセッションを破棄する。
+// ABOUTME: SIWE サインイン。Polygon 以外へ切り替えたらサーバーセッションを破棄する。
 // ABOUTME: MetaMask の署名拒否は再試行できる画面エラーとして扱う。
 "use client";
 
@@ -7,7 +7,7 @@ import { SiweMessage } from "siwe";
 import { useAccount, useSignMessage } from "wagmi";
 import { polygon } from "wagmi/chains";
 import { buttonStyles } from "@/lib/ui";
-import { useRefreshSession, useSession } from "@/lib/useSession";
+import { useRefreshSession, useSession, useSignOut } from "@/lib/useSession";
 
 export function SignInWithEthereum() {
   const { address, chainId } = useAccount();
@@ -16,6 +16,7 @@ export function SignInWithEthereum() {
   // サインイン済みが消え、期限切れ後も「サインイン済み」と出てしまう(Issue #40)。
   const { data: session, isPending } = useSession();
   const refreshSession = useRefreshSession();
+  const signOut = useSignOut();
   const [error, setError] = useState<string | null>(null);
 
   // セッションのアドレスは正規化済みの小文字、wagmi 側はチェックサム表記なので、
@@ -24,21 +25,14 @@ export function SignInWithEthereum() {
   const connectedMatchesSession =
     signedInAs !== null && address?.toLowerCase() === signedInAs;
 
+  // ここで見るのはチェーンのずれだけ。アカウントのずれはヘッダーの
+  // SessionStatus が全ページで見ている(Issue #44)。両方で見ると、
+  // /setup を開いている間だけ logout が二重に飛ぶ。
   useEffect(() => {
-    if (!signedInAs) return;
-    // ウォレット未接続では何もしない。wagmi の再接続が終わる前は address が
-    // undefined になるため、ここで破棄すると有効なセッションを消してしまう。
-    if (!address) return;
-    if (address.toLowerCase() === signedInAs && chainId === polygon.id) return;
-
-    void (async () => {
-      try {
-        await fetch("/api/auth/logout", { method: "POST" });
-      } finally {
-        await refreshSession();
-      }
-    })();
-  }, [signedInAs, address, chainId, refreshSession]);
+    if (!connectedMatchesSession) return;
+    if (chainId === polygon.id) return;
+    void signOut();
+  }, [connectedMatchesSession, chainId, signOut]);
 
   async function signIn() {
     setError(null);
