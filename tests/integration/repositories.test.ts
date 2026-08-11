@@ -160,6 +160,29 @@ describe("repositories (local supabase)", () => {
     });
   });
 
+  // Allowlistのtx hashは applications 側に列がないため、履歴だけが記録先になる(Issue #33)。
+  it("records an allowlist tx hash in the event history", async () => {
+    const { members, applications } = getRepositories();
+    const m = await members.upsertByAddress(ADDR);
+    const app = await applications.create(m.id);
+    await applications.transition({
+      applicationId: app.id,
+      field: "allowlist",
+      toStatus: "added",
+      expectedStatus: "pending",
+      actorAddress: ADMIN,
+      txId: "0xallowlist",
+    });
+
+    const events = await applications.listEvents([app.id]);
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({ field: "allowlist", toStatus: "added", txId: "0xallowlist" });
+
+    // 配布用のキャッシュ列は Allowlist の tx hash で汚さない。
+    const listed = await applications.listAll();
+    expect(listed[0].distributionTxId).toBeNull();
+  });
+
   it("rejects a transition whose expected status is stale", async () => {
     const { members, applications } = getRepositories();
     const m = await members.upsertByAddress(ADDR);

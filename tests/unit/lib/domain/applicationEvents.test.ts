@@ -1,7 +1,7 @@
-// ABOUTME: 遷移履歴から field ごとの最新の理由を取り出すロジックを検証する。
-// ABOUTME: 理由なしの遷移を拾わないこと、後の理由が前を隠さないことを固定する。
+// ABOUTME: 遷移履歴から field ごとの最新の理由・tx hashを取り出すロジックを検証する。
+// ABOUTME: 記録のない遷移を拾わないこと、後の遷移が前を隠さないことを固定する。
 import { describe, expect, it } from "vitest";
-import { latestReasonsByApplication } from "@/lib/domain/applicationEvents";
+import { latestReasonsByApplication, latestTxIdsByApplication } from "@/lib/domain/applicationEvents";
 import type { Address, ApplicationEvent, StatusField } from "@/lib/domain/types";
 
 const ACTOR = `0x${"22".repeat(20)}` as Address;
@@ -71,5 +71,38 @@ describe("latestReasonsByApplication", () => {
 
     expect(reasons.get("a1")?.review?.reason).toBe("a1の理由");
     expect(reasons.get("a2")?.review?.reason).toBe("a2の理由");
+  });
+});
+
+describe("latestTxIdsByApplication", () => {
+  it("keeps the tx hash of each field separate", () => {
+    const txIds = latestTxIdsByApplication([
+      event({ field: "allowlist", toStatus: "added", txId: "0xallow", createdAt: "2026-08-09T01:00:00Z" }),
+      event({ field: "distribution", toStatus: "sent", txId: "0xsend", createdAt: "2026-08-09T02:00:00Z" }),
+    ]);
+
+    // Allowlist の tx hash は applications 側に列がなく、履歴だけが持つ(Issue #33)。
+    expect(txIds.get("a1")?.allowlist?.txId).toBe("0xallow");
+    expect(txIds.get("a1")?.distribution?.txId).toBe("0xsend");
+    expect(txIds.get("a1")?.review).toBeUndefined();
+  });
+
+  it("ignores transitions recorded without a tx hash", () => {
+    const txIds = latestTxIdsByApplication([
+      // 失敗の記録は理由だけで tx hash を持たない。これが成功時の hash を隠してはいけない。
+      event({ field: "allowlist", toStatus: "failed", reason: "ガス不足", createdAt: "2026-08-09T04:00:00Z" }),
+      event({ field: "allowlist", toStatus: "added", txId: "0xallow", createdAt: "2026-08-09T02:00:00Z" }),
+    ]);
+
+    expect(txIds.get("a1")?.allowlist?.txId).toBe("0xallow");
+  });
+
+  it("takes the newest tx hash within a field", () => {
+    const txIds = latestTxIdsByApplication([
+      event({ field: "distribution", txId: "0xold", createdAt: "2026-08-09T01:00:00Z" }),
+      event({ field: "distribution", txId: "0xnew", createdAt: "2026-08-09T03:00:00Z" }),
+    ]);
+
+    expect(txIds.get("a1")?.distribution?.txId).toBe("0xnew");
   });
 });

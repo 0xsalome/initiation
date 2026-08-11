@@ -209,6 +209,7 @@ describe("transitionApplication", () => {
       field: "allowlist",
       toStatus: "added",
       reason: "コントラクト側で追加を確認",
+      txId: "0xallowlist",
     });
 
     expect(result).toEqual({ ok: true });
@@ -219,8 +220,55 @@ describe("transitionApplication", () => {
       expectedStatus: "pending",
       actorAddress: ADMIN_ADDR,
       reason: "コントラクト側で追加を確認",
-      txId: undefined,
+      txId: "0xallowlist",
     });
+  });
+
+  // Allowlist追加もオンチェーン操作なので、配布と同じくtx hashを必須にする(Issue #33)。
+  it("rejects an allowlist completion without a tx hash", async () => {
+    listAllMock.mockResolvedValue([application({ reviewStatus: "approved" })]);
+
+    const result = await transitionApplication({
+      applicationId: "a1",
+      field: "allowlist",
+      toStatus: "added",
+    });
+
+    expect(result).toEqual({
+      ok: false,
+      error: "Allowlist追加のトランザクションIDを入力してください",
+    });
+    expect(transitionMock).not.toHaveBeenCalled();
+  });
+
+  it("trims an allowlist tx hash before recording it", async () => {
+    listAllMock.mockResolvedValue([application({ reviewStatus: "approved" })]);
+
+    const result = await transitionApplication({
+      applicationId: "a1",
+      field: "allowlist",
+      toStatus: "added",
+      txId: "  0xallowlist  ",
+    });
+
+    expect(result).toEqual({ ok: true });
+    expect(transitionMock).toHaveBeenCalledWith(
+      expect.objectContaining({ field: "allowlist", toStatus: "added", txId: "0xallowlist" }),
+    );
+  });
+
+  // 失敗の記録はオンチェーン取引が成立していないので、tx hashを求めない。
+  it("does not require a tx hash when recording an allowlist failure", async () => {
+    listAllMock.mockResolvedValue([application({ reviewStatus: "approved" })]);
+
+    const result = await transitionApplication({
+      applicationId: "a1",
+      field: "allowlist",
+      toStatus: "failed",
+      reason: "ガス不足でrevert",
+    });
+
+    expect(result).toEqual({ ok: true });
   });
 
   it("trims a distribution tx hash before recording it", async () => {
@@ -350,11 +398,12 @@ describe("transitionApplication", () => {
       applicationId: "a1",
       field: "allowlist",
       toStatus: "added",
+      txId: "0xretry",
     });
 
     expect(result).toEqual({ ok: true });
     expect(transitionMock).toHaveBeenCalledWith(
-      expect.objectContaining({ field: "allowlist", toStatus: "added" }),
+      expect.objectContaining({ field: "allowlist", toStatus: "added", expectedStatus: "failed" }),
     );
   });
 
