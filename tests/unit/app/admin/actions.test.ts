@@ -7,6 +7,7 @@ const {
   transitionMock,
   listAllMock,
   requireAdminMock,
+  consumeMock,
   MockForbiddenError,
   MockUnauthenticatedError,
   MockConcurrentTransitionError,
@@ -18,6 +19,7 @@ const {
     transitionMock: vi.fn(),
     listAllMock: vi.fn(),
     requireAdminMock: vi.fn(),
+    consumeMock: vi.fn(),
     MockForbiddenError,
     MockUnauthenticatedError,
     MockConcurrentTransitionError,
@@ -25,7 +27,10 @@ const {
 });
 
 vi.mock("@/lib/repositories", () => ({
-  getRepositories: () => ({ applications: { transition: transitionMock, listAll: listAllMock } }),
+  getRepositories: () => ({
+    applications: { transition: transitionMock, listAll: listAllMock },
+    rateLimits: { consume: consumeMock },
+  }),
   ConcurrentTransitionError: MockConcurrentTransitionError,
 }));
 
@@ -64,6 +69,8 @@ describe("transitionApplication", () => {
     listAllMock.mockReset();
     requireAdminMock.mockReset();
     requireAdminMock.mockResolvedValue({ address: ADMIN_ADDR });
+    consumeMock.mockReset();
+    consumeMock.mockResolvedValue(true);
   });
 
   it("applies a valid review transition with actor recorded", async () => {
@@ -458,6 +465,36 @@ describe("transitionApplication", () => {
 
     expect(result).toEqual({ ok: false, error: "申請が見つかりません" });
     expect(transitionMock).not.toHaveBeenCalled();
+  });
+
+  it("stops the call before loading applications when rate limited", async () => {
+    consumeMock.mockResolvedValue(false);
+
+    const result = await transitionApplication({
+      applicationId: "a1",
+      field: "review",
+      toStatus: "approved",
+    });
+
+    expect(result.ok).toBe(false);
+    expect(result.error).toContain("申請の状態更新が多すぎます");
+    // 一覧の取得は全申請を読むため、上限に達した呼び出しはそこへ届かせない。
+    expect(listAllMock).not.toHaveBeenCalled();
+    expect(transitionMock).not.toHaveBeenCalled();
+  });
+
+  it("counts the attempt against the acting admin address", async () => {
+    listAllMock.mockResolvedValue([application()]);
+
+    await transitionApplication({ applicationId: "a1", field: "review", toStatus: "approved" });
+
+    expect(consumeMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        bucket: "application_transition",
+        subject: ADMIN_ADDR,
+        limit: 120,
+      }),
+    );
   });
 
   it("returns a permission error for non-admin callers", async () => {

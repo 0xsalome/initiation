@@ -15,6 +15,11 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["tests/**/*.test.ts"],
+    // 統合テストは1つのローカルSupabaseを共有する。ファイルを並列に走らせると、
+    // 片方の truncateAll がもう片方の実行中の行を消してしまう(Issue #37 で
+    // 2ファイル目を足したときに外部キー違反として表面化した)。
+    // 単体テストは十分速いので、分けずに全体を直列にしている。
+    fileParallelism: false,
   },
   resolve: {
     alias: { "@": path.resolve(rootDir) },

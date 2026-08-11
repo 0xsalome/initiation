@@ -55,6 +55,19 @@ export interface CheckinRepository {
   listByMember(memberId: string): Promise<Checkin[]>;
 }
 
+export interface RateLimitRepository {
+  /**
+   * 1回分を数えて、上限内なら true、越えていれば false を返す。
+   * 数え上げと判定はDB側の関数が1文で行う(同時呼び出しで上限を越えないため)。
+   */
+  consume(params: {
+    bucket: string;
+    subject: Address;
+    limit: number;
+    windowSeconds: number;
+  }): Promise<boolean>;
+}
+
 export class DuplicateApplicationError extends Error {
   constructor(message = "active application already exists") {
     super(message);
@@ -75,6 +88,7 @@ export type Repositories = {
   progress: ProgressRepository;
   applications: ApplicationRepository;
   checkins: CheckinRepository;
+  rateLimits: RateLimitRepository;
 };
 
 export function getRepositories(): Repositories {
