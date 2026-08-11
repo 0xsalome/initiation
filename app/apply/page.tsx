@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ApplyForm } from "@/components/ApplyForm";
 import { allowlistLabel, distributionLabel, reviewLabel } from "@/lib/applicationLabels";
+import { latestReasonsByApplication } from "@/lib/domain/applicationEvents";
 import type { Application } from "@/lib/domain/types";
 import { requireMember, UnauthenticatedError } from "@/lib/auth/guards";
 import { getRepositories } from "@/lib/repositories";
@@ -10,9 +11,17 @@ import { cardStyles } from "@/lib/ui";
 
 export default async function ApplyPage() {
   let application: Application | null;
+  let reviewReason: string | null = null;
   try {
     const member = await requireMember();
-    application = await getRepositories().applications.findActiveByMember(member.id);
+    const repositories = getRepositories();
+    // 却下済みも取得する。除外すると申請フォームが再表示されるだけで、
+    // 見送りになったことも理由も申請者へ伝わらない(Issue #19)。
+    application = await repositories.applications.findLatestByMember(member.id);
+    if (application) {
+      const events = await repositories.applications.listEvents([application.id]);
+      reviewReason = latestReasonsByApplication(events).get(application.id)?.review?.reason ?? null;
+    }
   } catch (error) {
     if (error instanceof UnauthenticatedError) {
       return (
@@ -26,6 +35,8 @@ export default async function ApplyPage() {
     throw error;
   }
 
+  const isRejected = application?.reviewStatus === "rejected";
+
   return (
     <main className="space-y-8">
       <header>
@@ -37,7 +48,7 @@ export default async function ApplyPage() {
           Initiation完走後、運営が内容を確認してAllowlist追加とHENKAKU送付を手動で行います。
         </p>
       </header>
-      {application ? (
+      {application && (
         <section className={cardStyles}>
           <h2 className="text-xl font-bold text-foreground">申請の状態</h2>
           <dl className="mt-5 divide-y divide-border">
@@ -45,21 +56,34 @@ export default async function ApplyPage() {
               <dt className="text-sm font-semibold text-muted">審査</dt>
               <dd className="font-semibold text-foreground">{reviewLabel[application.reviewStatus]}</dd>
             </div>
-            <div className="grid gap-1 py-3 sm:grid-cols-[10rem_1fr] sm:gap-4">
-              <dt className="text-sm font-semibold text-muted">Allowlist</dt>
-              <dd className="font-semibold text-foreground">{allowlistLabel(application.allowlistStatus)}</dd>
-            </div>
-            <div className="grid gap-1 py-3 sm:grid-cols-[10rem_1fr] sm:gap-4">
-              <dt className="text-sm font-semibold text-muted">HENKAKU 配布</dt>
-              <dd className="font-semibold text-foreground">
-                {distributionLabel(application.distributionStatus, application.distributionTxId)}
-              </dd>
-            </div>
+            {/* 却下・要追加情報は理由が判断の中身そのものなので、状態と並べて示す。 */}
+            {reviewReason && application.reviewStatus !== "approved" && (
+              <div className="grid gap-1 py-3 sm:grid-cols-[10rem_1fr] sm:gap-4">
+                <dt className="text-sm font-semibold text-muted">理由</dt>
+                <dd className="leading-7 text-foreground">{reviewReason}</dd>
+              </div>
+            )}
+            {isRejected ? null : (
+              <>
+                <div className="grid gap-1 py-3 sm:grid-cols-[10rem_1fr] sm:gap-4">
+                  <dt className="text-sm font-semibold text-muted">Allowlist</dt>
+                  <dd className="font-semibold text-foreground">{allowlistLabel(application.allowlistStatus)}</dd>
+                </div>
+                <div className="grid gap-1 py-3 sm:grid-cols-[10rem_1fr] sm:gap-4">
+                  <dt className="text-sm font-semibold text-muted">HENKAKU 配布</dt>
+                  <dd className="font-semibold text-foreground">
+                    {distributionLabel(application.distributionStatus, application.distributionTxId)}
+                  </dd>
+                </div>
+              </>
+            )}
           </dl>
+          {isRejected && (
+            <p className="mt-5 leading-7 text-muted">内容を見直して、もう一度申請できます。</p>
+          )}
         </section>
-      ) : (
-        <ApplyForm />
       )}
+      {(!application || isRejected) && <ApplyForm reapply={isRejected} />}
     </main>
   );
 }

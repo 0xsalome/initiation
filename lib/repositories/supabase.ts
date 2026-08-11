@@ -5,6 +5,7 @@ import { normalizeAddress } from "@/lib/domain/address";
 import type {
   Address,
   Application,
+  ApplicationEvent,
   ApplicationWithMember,
   Checkin,
   Member,
@@ -121,6 +122,20 @@ function toApplication(row: Row): Application {
   };
 }
 
+function toApplicationEvent(row: Row): ApplicationEvent {
+  return {
+    id: row.id as string,
+    applicationId: row.application_id as string,
+    field: row.field as StatusField,
+    fromStatus: (row.from_status as string) ?? null,
+    toStatus: row.to_status as string,
+    actorAddress: row.actor_address as Address,
+    reason: (row.reason as string) ?? null,
+    txId: (row.tx_id as string) ?? null,
+    createdAt: row.created_at as string,
+  };
+}
+
 // どのフィールドがどの列に対応するかは transition_application 関数が持つ。
 // ここは受け付ける値の網羅性だけをRecordで担保する(StatusFieldを増やすと型エラーになる)。
 const VALID_STATUS_FIELDS: Record<StatusField, true> = {
@@ -130,12 +145,15 @@ const VALID_STATUS_FIELDS: Record<StatusField, true> = {
 };
 
 const applications: ApplicationRepository = {
-  async findActiveByMember(memberId) {
+  async findLatestByMember(memberId) {
+    // 却下済みは member あたり複数行あり得る(applications_active_per_member は
+    // rejected を対象外にしている)ため、maybeSingle ではなく最新の1件を取る。
     const { data, error } = await client()
       .from("applications")
       .select("*")
       .eq("member_id", memberId)
-      .neq("review_status", "rejected")
+      .order("created_at", { ascending: false })
+      .limit(1)
       .maybeSingle();
     if (error) throw error;
     return data ? toApplication(data as Row) : null;
@@ -176,6 +194,17 @@ const applications: ApplicationRepository = {
         displayName: (member.display_name as string) ?? null,
       } satisfies ApplicationWithMember;
     });
+  },
+
+  async listEvents(applicationIds) {
+    if (applicationIds.length === 0) return [];
+    const { data, error } = await client()
+      .from("application_events")
+      .select("*")
+      .in("application_id", applicationIds)
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    return (data ?? []).map((row) => toApplicationEvent(row as Row));
   },
 
   async transition({ applicationId, field, toStatus, expectedStatus, actorAddress, reason, txId }) {

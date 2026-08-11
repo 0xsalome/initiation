@@ -2,6 +2,7 @@
 // ABOUTME: requireAdminで保護し、一般メンバーや未認証者には404相当を返す。
 import { AdminApplicationRow } from "@/components/AdminApplicationRow";
 import { ForbiddenError, requireAdmin, UnauthenticatedError } from "@/lib/auth/guards";
+import { latestReasonsByApplication } from "@/lib/domain/applicationEvents";
 import { getRepositories } from "@/lib/repositories";
 import { notFound } from "next/navigation";
 
@@ -15,7 +16,11 @@ export default async function AdminPage() {
     throw error;
   }
 
-  const applications = await getRepositories().applications.listAll();
+  const repositories = getRepositories();
+  const applications = await repositories.applications.listAll();
+  // 一覧の全申請分をまとめて1回で取得する(申請ごとに問い合わせない)。
+  const events = await repositories.applications.listEvents(applications.map((item) => item.id));
+  const reasons = latestReasonsByApplication(events);
 
   return (
     <main className="space-y-8">
@@ -57,7 +62,11 @@ export default async function AdminPage() {
             </thead>
             <tbody className="divide-y divide-border">
               {applications.map((application) => (
-                <AdminApplicationRow key={application.id} application={application} />
+                <AdminApplicationRow
+                  key={application.id}
+                  application={application}
+                  reasons={reasons.get(application.id)}
+                />
               ))}
             </tbody>
           </table>

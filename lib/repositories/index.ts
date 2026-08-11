@@ -4,6 +4,7 @@ import { supabaseRepositories } from "./supabase";
 import type {
   Address,
   Application,
+  ApplicationEvent,
   ApplicationWithMember,
   Checkin,
   Member,
@@ -23,9 +24,16 @@ export interface ProgressRepository {
 }
 
 export interface ApplicationRepository {
-  findActiveByMember(memberId: string): Promise<Application | null>;
+  /**
+   * 却下済みも含めた直近の申請。申請者へ却下の結果を伝えるために使う。
+   * 重複申請の判定はここではなく、`create` が返す DuplicateApplicationError
+   * (DBの一意インデックス applications_active_per_member)が担う。
+   */
+  findLatestByMember(memberId: string): Promise<Application | null>;
   create(memberId: string): Promise<Application>;
   listAll(): Promise<ApplicationWithMember[]>;
+  /** 指定した申請の遷移履歴を新しい順で返す。理由の表示に使う。 */
+  listEvents(applicationIds: string[]): Promise<ApplicationEvent[]>;
   /**
    * 状態を遷移させる。`expectedStatus` は呼び出し側が遷移ルールを検証した時点の値で、
    * 実装はこれを条件にした条件付き更新を行う。DB上の値が変わっていた場合は

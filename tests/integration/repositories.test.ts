@@ -58,6 +58,80 @@ describe("repositories (local supabase)", () => {
     expect(second.id).not.toBe(app.id);
   });
 
+  it("returns the rejected application from findLatestByMember", async () => {
+    const { members, applications } = getRepositories();
+    const m = await members.upsertByAddress(ADDR);
+    const app = await applications.create(m.id);
+    await applications.transition({
+      applicationId: app.id,
+      field: "review",
+      toStatus: "rejected",
+      expectedStatus: "pending",
+      actorAddress: ADMIN,
+      reason: "チェックイン履歴が見当たりませんでした",
+    });
+
+    // 申請者へ結果を伝えるための経路は却下を返す。却下が重複判定の対象外である
+    // ことは "allows re-application after rejection" が押さえている。
+    const latest = await applications.findLatestByMember(m.id);
+    expect(latest?.id).toBe(app.id);
+    expect(latest?.reviewStatus).toBe("rejected");
+  });
+
+  it("returns the newest application when an earlier one was rejected", async () => {
+    const { members, applications } = getRepositories();
+    const m = await members.upsertByAddress(ADDR);
+    const first = await applications.create(m.id);
+    await applications.transition({
+      applicationId: first.id,
+      field: "review",
+      toStatus: "rejected",
+      expectedStatus: "pending",
+      actorAddress: ADMIN,
+      reason: "情報不足",
+    });
+    const second = await applications.create(m.id);
+
+    expect((await applications.findLatestByMember(m.id))?.id).toBe(second.id);
+  });
+
+  it("lists per-field reasons from the event history", async () => {
+    const { members, applications } = getRepositories();
+    const m = await members.upsertByAddress(ADDR);
+    const app = await applications.create(m.id);
+    await applications.transition({
+      applicationId: app.id,
+      field: "review",
+      toStatus: "approved",
+      expectedStatus: "pending",
+      actorAddress: ADMIN,
+    });
+    await applications.transition({
+      applicationId: app.id,
+      field: "allowlist",
+      toStatus: "failed",
+      expectedStatus: "pending",
+      actorAddress: ADMIN,
+      reason: "ガス不足でrevert",
+    });
+
+    const events = await applications.listEvents([app.id]);
+    expect(events).toHaveLength(2);
+    // applications.reason は直近の1件で上書きされるが、履歴には両方が残る。
+    const allowlistEvent = events.find((event) => event.field === "allowlist");
+    expect(allowlistEvent).toMatchObject({
+      applicationId: app.id,
+      fromStatus: "pending",
+      toStatus: "failed",
+      actorAddress: ADMIN,
+      reason: "ガス不足でrevert",
+    });
+  });
+
+  it("returns no events without querying when given no ids", async () => {
+    expect(await getRepositories().applications.listEvents([])).toEqual([]);
+  });
+
   it("records an audit event on transition", async () => {
     const { members, applications } = getRepositories();
     const m = await members.upsertByAddress(ADDR);
