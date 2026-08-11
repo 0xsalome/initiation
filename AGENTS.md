@@ -10,6 +10,14 @@ HENKAKU Initiation。docs/development-plan.md が全体計画、docs/superpowers
 - 依存更新: Dependabotの更新PRは、CIが緑でも自動マージしない。ウォレット・ブラウザ依存のフローはCIの対象外なので、`wagmi` / `viem` / `next` を含む更新は `/setup` の接続と署名を手で確認してからマージする(`docs/decisions/2026-08-10-dependency-updates.md`)
 - Dependabotのnpm更新で`npm ci`がlockfile不整合になった場合は、CIを緩めず`docs/decisions/2026-08-11-dependabot-lockfile-recovery.md`の一時復旧手順に従う
 
+## Work selection
+
+Treat `docs/development-plan.md` as the source of truth for product direction. Open Issues are a backlog, not a priority list.
+
+Unless explicitly requested otherwise, choose work that directly advances the current phase's completion condition. Prefer core user and operator flows over infrastructure, refactoring, documentation, design polish, and future-phase work.
+
+Before implementation, explain how the change advances the completion condition. If a product decision is missing, prepare the smallest decision aid or prototype and ask for direction. If no core work can proceed, report the blocker instead of switching to an easier peripheral Issue.
+
 ## ページ構成
 
 - `/setup`: ウォレット接続、SIWEサインイン、Polygon切替、HENKAKU追加
