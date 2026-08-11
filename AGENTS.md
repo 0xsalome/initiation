@@ -8,6 +8,7 @@ HENKAKU Initiation。docs/development-plan.md が全体計画、docs/superpowers
 - 決定事項は `docs/decisions/` に1決定1ファイルで記録。命名規則は `docs/decisions.md` を参照
 - CI: PRとmainへのpushで `.github/workflows/ci.yml` が検証コマンドを実行する
 - 依存更新: Dependabotの更新PRは、CIが緑でも自動マージしない。ウォレット・ブラウザ依存のフローはCIの対象外なので、`wagmi` / `viem` / `next` を含む更新は `/setup` の接続と署名を手で確認してからマージする(`docs/decisions/2026-08-10-dependency-updates.md`)
+- Dependabotのnpm更新で`npm ci`がlockfile不整合になった場合は、CIを緩めず`docs/decisions/2026-08-11-dependabot-lockfile-recovery.md`の一時復旧手順に従う
 
 ## ページ構成
 
