@@ -128,16 +128,24 @@ npx tsc --noEmit
 - 質問箱は未実装です。まず人だけで質問・回答のループを検証し、その後AIを検討します
 - AIはフェーズ3で回答案と参考情報を作る補助役として導入し、最終回答は人が確認します
 - Vercel / Supabase本番環境へのデプロイは延期中です
-- 本番公開前にプライバシー方針を確定してください（ライセンスはMITで確定済みです）
+- 本番公開前にプライバシー方針を確定してください（ライセンスは確定済みです。コードとドキュメントはMIT、創作物はCC BY 4.0）
 
 全体計画は [docs/development-plan.md](docs/development-plan.md)、実装計画は [docs/superpowers/plans/2026-08-06-phase1-initiation-mvp1.md](docs/superpowers/plans/2026-08-06-phase1-initiation-mvp1.md)、決定事項は [docs/decisions.md](docs/decisions.md) から参照できます。
 
 ## ライセンス
 
-[MIT License](LICENSE) で公開しています。著作権者の表記は `henkaku Community` です。
+**ソフトウェアと創作物で分けています。** 著作権者の表記はどちらも `henkaku Community` です。
 
-適用範囲はリポジトリのコード・ドキュメント・素材（画像・音源など）です。第三者から取り込んだ素材が別の条件で提供されている場合は、その素材の配置場所に明記します。
+| 対象 | ライセンス |
+| --- | --- |
+| コード（`app/` `components/` `lib/` `supabase/` `scripts/` `tests/` と設定ファイル） | [MIT License](LICENSE) |
+| ドキュメント（`docs/` と `README.md`・`CONTRIBUTING.md` などのMarkdown） | [MIT License](LICENSE) |
+| 創作物（イラスト・音源など、コードとドキュメント以外） | [CC BY 4.0](LICENSE-CC-BY-4.0.txt) |
 
-Pull Requestは、リポジトリと同じMIT Licenseで提供されたものとして扱います（inbound = outbound）。詳細は [CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。
+MITはソフトウェア向けの文面で、イラストや音源へ適用すると**再利用する人が何をすれば条件を満たすのかを読み取れません。** 創作物をCC BY 4.0にしているのはこのためで、CC BY 4.0では帰属表示がライセンス上の義務になります。
 
-判断の経緯は [ライセンスの決定](docs/decisions/2026-08-11-license-mit.md) に記録しています。
+現時点でリポジトリに創作物はありません。追加するときの許諾と表示の手順は [CONTRIBUTING.md](CONTRIBUTING.md) にあります。第三者から取り込んだ素材が上のどちらとも違う条件で提供されている場合は、その素材の配置ディレクトリに明記します。
+
+Pull Requestは、上の区分に沿って同じライセンスで提供されたものとして扱います（inbound = outbound）。
+
+判断の経緯は [ライセンスの決定](docs/decisions/2026-08-11-license.md) に記録しています。

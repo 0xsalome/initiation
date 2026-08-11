@@ -109,9 +109,11 @@ git push -u origin <ブランチ名>
 
 ## ライセンスの前提
 
-Pull Requestは、リポジトリと同じ [MIT License](https://github.com/henkaku-center/initiation/blob/main/LICENSE) で提供されたものとして扱います（inbound = outbound）。
+このリポジトリはソフトウェアと創作物でライセンスを分けています。**コードとドキュメントは [MIT License](https://github.com/henkaku-center/initiation/blob/main/LICENSE)、イラストや音源などの創作物は [CC BY 4.0](https://github.com/henkaku-center/initiation/blob/main/LICENSE-CC-BY-4.0.txt)** です。
 
-自分が権利を持たないコード・文章・画像を含める場合は、**出典と元のライセンスをPull Requestに書いてください。** 画像を追加するときの手順を含め、詳しくは [CONTRIBUTING.md](https://github.com/henkaku-center/initiation/blob/main/CONTRIBUTING.md) にあります。
+Pull Requestは、この区分に沿ったライセンスで提供されたものとして扱います（inbound = outbound）。
+
+自分が権利を持たないコード・文章・創作物を含める場合は、**出典と元のライセンスをPull Requestに書いてください。** 創作物を追加するときの許諾と帰属表示の手順は [CONTRIBUTING.md](https://github.com/henkaku-center/initiation/blob/main/CONTRIBUTING.md) にあります。
 
 ## Next.js に関する変更をするとき
 
