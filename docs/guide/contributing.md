@@ -107,6 +107,12 @@ git push -u origin <ブランチ名>
 - **秘密情報や個人情報をコミットしない。** `.env.local`、Supabaseのキー、ウォレットの秘密鍵、Safeの認証情報は絶対に含めません
 - コマンドの実行結果を貼るときも、キーが混ざっていないか確認してください
 
+## ライセンスの前提
+
+Pull Requestは、リポジトリと同じ [MIT License](https://github.com/henkaku-center/initiation/blob/main/LICENSE) で提供されたものとして扱います（inbound = outbound）。
+
+自分が権利を持たないコード・文章・画像を含める場合は、**出典と元のライセンスをPull Requestに書いてください。** 画像を追加するときの手順を含め、詳しくは [CONTRIBUTING.md](https://github.com/henkaku-center/initiation/blob/main/CONTRIBUTING.md) にあります。
+
 ## Next.js に関する変更をするとき
 
 このプロジェクトが使っているNext.jsのバージョンは、学習済みの知識と挙動が異なる場合があります。変更前に、リポジトリの `AGENTS.md` と `node_modules/next/dist/docs/` の該当ガイドを確認してください。

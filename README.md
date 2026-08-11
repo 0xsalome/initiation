@@ -118,6 +118,8 @@ npx tsc --noEmit
 5. 変更理由、検証内容、未解決の判断をPull Requestに書く
 6. UI変更はスクリーンショットまたは手動確認手順を添える
 
+コントリビューションのライセンスとmaintainerの考え方は [CONTRIBUTING.md](CONTRIBUTING.md) にあります。
+
 判断が必要な事項は勝手に仕様化せず、`docs/decisions/` に1決定1ファイルで記録してから実装します。命名規則は [決定事項の読み方](docs/decisions.md) を参照してください。Next.jsの変更を行うときは、リポジトリの `AGENTS.md` と `node_modules/next/dist/docs/` の該当ガイドを確認してください。
 
 ## 現在の制約と次の計画
@@ -126,10 +128,16 @@ npx tsc --noEmit
 - 質問箱は未実装です。まず人だけで質問・回答のループを検証し、その後AIを検討します
 - AIはフェーズ3で回答案と参考情報を作る補助役として導入し、最終回答は人が確認します
 - Vercel / Supabase本番環境へのデプロイは延期中です
-- 本番公開前にプライバシー方針とライセンスを確定してください（現時点でLICENSEファイルは未設定です）
+- 本番公開前にプライバシー方針を確定してください（ライセンスはMITで確定済みです）
 
 全体計画は [docs/development-plan.md](docs/development-plan.md)、実装計画は [docs/superpowers/plans/2026-08-06-phase1-initiation-mvp1.md](docs/superpowers/plans/2026-08-06-phase1-initiation-mvp1.md)、決定事項は [docs/decisions.md](docs/decisions.md) から参照できます。
 
 ## ライセンス
 
-コミュニティに公開する前に、コードの利用・改変・再配布条件を決めてLICENSEファイルを追加してください。ライセンスはプロジェクト運営者の判断が必要なため、ここでは未決定のままにしています。
+[MIT License](LICENSE) で公開しています。著作権者の表記は `henkaku Community` です。
+
+適用範囲はリポジトリのコード・ドキュメント・素材（画像・音源など）です。第三者から取り込んだ素材が別の条件で提供されている場合は、その素材の配置場所に明記します。
+
+Pull Requestは、リポジトリと同じMIT Licenseで提供されたものとして扱います（inbound = outbound）。詳細は [CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。
+
+判断の経緯は [ライセンスの決定](docs/decisions/2026-08-11-license-mit.md) に記録しています。
