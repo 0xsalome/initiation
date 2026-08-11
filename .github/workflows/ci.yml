@@ -15,6 +15,23 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  audit:
+    name: dependency audit (production)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # 本番の配信物に入る依存だけを見て、high以上で落とす。
+      # devを含めると vitepress 経由の esbuild(No fix available、開発サーバー向けの
+      # 勧告)で常に赤くなり、通知として機能しなくなる。moderate以下で落とさないのは、
+      # 修正の出ていない勧告1件で無関係なPRまで止めないため(Issue #38)。
+      # npm audit は package-lock.json だけで動くので npm ci は要らない。
+      - run: npm audit --omit=dev --audit-level=high
+
   static:
     name: build / typecheck / lint / unit (Node ${{ matrix.node }})
     runs-on: ubuntu-latest

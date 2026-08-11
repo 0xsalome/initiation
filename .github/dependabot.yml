@@ -1,0 +1,45 @@
+# ABOUTME: 依存関係の更新PRを自動で作る設定。npmは週次、GitHub Actionsは月次。
+# ABOUTME: 運営が少ないため、まとめられる更新は1本のPRへ束ねてレビューの回数を減らす。
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Asia/Tokyo
+    # 束ねた結果、通常は本番/開発の2本。majorが出た週だけこれを超える。
+    open-pull-requests-limit: 5
+    groups:
+      # minorとpatchは束ねる。1件ずつPRが来ると、週に何本も溜まってレビューが
+      # 追いつかなくなる。majorはgroupsの対象外なので個別のPRになる。
+      production-minor-patch:
+        dependency-type: production
+        update-types: [minor, patch]
+      development-minor-patch:
+        dependency-type: development
+        update-types: [minor, patch]
+    ignore:
+      # フレームワークのmajorは自動で上げない。AGENTS.mdが警告しているとおり、
+      # このNext.jsは学習データと異なる破壊的変更を含んでいて、
+      # node_modules/next/dist/docs/ を読んでからでないと移行できない。
+      # react / react-dom / eslint-config-next はnextと足並みを揃える必要がある。
+      - dependency-name: next
+        update-types: [version-update:semver-major]
+      - dependency-name: eslint-config-next
+        update-types: [version-update:semver-major]
+      - dependency-name: react
+        update-types: [version-update:semver-major]
+      - dependency-name: react-dom
+        update-types: [version-update:semver-major]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+      timezone: Asia/Tokyo
+    groups:
+      github-actions:
+        patterns: ["*"]
