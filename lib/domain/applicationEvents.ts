@@ -29,6 +29,26 @@ function latestByField(
   return result;
 }
 
+/**
+ * 申請IDごとの全遷移を新しい順で返す。運営が経緯を追うための履歴表示に使う(Issue #34)。
+ * 上の2つと違い、理由や tx hash を持たない遷移も落とさない。
+ */
+export function eventsByApplication(
+  events: ApplicationEvent[],
+): Map<string, ApplicationEvent[]> {
+  const result = new Map<string, ApplicationEvent[]>();
+  for (const event of events) {
+    const forApplication = result.get(event.applicationId) ?? [];
+    forApplication.push(event);
+    result.set(event.applicationId, forApplication);
+  }
+  // 呼び出し側の並び順に依存しないよう、ここで新しい順へ揃える。
+  for (const forApplication of result.values()) {
+    forApplication.sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
+  }
+  return result;
+}
+
 /** 理由が記録された最新の遷移。理由のない遷移(承認など)は拾わない。 */
 export function latestReasonsByApplication(
   events: ApplicationEvent[],

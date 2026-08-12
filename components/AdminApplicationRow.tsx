@@ -4,28 +4,26 @@
 
 import { useRouter } from "next/navigation";
 import { Fragment, useState, useTransition } from "react";
+import { AdminApplicationHistory } from "@/components/AdminApplicationHistory";
+import { fieldLabel } from "@/lib/applicationEventLabels";
 import type { EventByField } from "@/lib/domain/applicationEvents";
-import type { ApplicationWithMember, StatusField } from "@/lib/domain/types";
+import type { ApplicationEvent, ApplicationWithMember, StatusField } from "@/lib/domain/types";
 import { transitionApplication } from "@/app/admin/actions";
 import { formatJst } from "@/lib/datetime";
 import { buttonStyles, inputStyles } from "@/lib/ui";
 
-const FIELD_LABELS: Record<StatusField, string> = {
-  review: "審査",
-  allowlist: "Allowlist",
-  distribution: "配布",
-};
-
-const FIELDS = Object.keys(FIELD_LABELS) as StatusField[];
+const FIELDS: StatusField[] = ["review", "allowlist", "distribution"];
 
 export function AdminApplicationRow({
   application,
   reasons = {},
   txIds = {},
+  events = [],
 }: {
   application: ApplicationWithMember;
   reasons?: EventByField;
   txIds?: EventByField;
+  events?: ApplicationEvent[];
 }) {
   const [error, setError] = useState<string | null>(null);
   const [txId, setTxId] = useState("");
@@ -200,7 +198,7 @@ export function AdminApplicationRow({
               <Fragment key={field}>
                 {reason && (
                   <div className="grid gap-1 sm:grid-cols-[7rem_1fr] sm:gap-3">
-                    <dt className="font-semibold text-muted">{FIELD_LABELS[field]}の理由</dt>
+                    <dt className="font-semibold text-muted">{fieldLabel(field)}の理由</dt>
                     <dd className="text-foreground">
                       {reason.reason}
                       <small className="ml-2 text-muted">
@@ -211,7 +209,7 @@ export function AdminApplicationRow({
                 )}
                 {tx && (
                   <div className="grid gap-1 sm:grid-cols-[7rem_1fr] sm:gap-3">
-                    <dt className="font-semibold text-muted">{FIELD_LABELS[field]}の tx hash</dt>
+                    <dt className="font-semibold text-muted">{fieldLabel(field)}の tx hash</dt>
                     <dd className="break-all font-mono text-xs text-foreground">
                       {tx.txId}
                       <small className="ml-2 font-sans text-muted">
@@ -224,6 +222,9 @@ export function AdminApplicationRow({
             ))}
           </dl>
         )}
+        {/* 上の dl は field ごとの最新1件だけを示す。再試行の経緯まで追うための全件は
+            折りたたみで出す。これがないとDBへ直接繋ぐしかない(Issue #34)。 */}
+        <AdminApplicationHistory events={events} />
         {error && <p className="mt-3 text-sm font-semibold text-rose-600 dark:text-rose-300" role="alert">{error}</p>}
       </td>
     </tr>

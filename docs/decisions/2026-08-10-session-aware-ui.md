@@ -42,4 +42,4 @@
 
 ## 残る重複
 
-`shortenAddress` を `lib/domain/address.ts` に置いた。#39（監査ログ閲覧）が `lib/applicationEventLabels.ts` に同じ処理を持っているため、両方がマージされた時点でどちらかへ寄せる。
+`shortenAddress` を `lib/domain/address.ts` に置いた。#39（監査ログ閲覧）が `lib/applicationEventLabels.ts` に同じ処理を持っていたため、**#39 の側で `lib/domain/address.ts` へ寄せた**（#34 / PR #39）。`applicationEventLabels.ts` に残るのは `fieldLabel` だけになる。

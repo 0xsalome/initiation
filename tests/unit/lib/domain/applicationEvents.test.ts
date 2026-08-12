@@ -1,7 +1,11 @@
 // ABOUTME: 遷移履歴から field ごとの最新の理由・tx hashを取り出すロジックを検証する。
 // ABOUTME: 記録のない遷移を拾わないこと、後の遷移が前を隠さないことを固定する。
 import { describe, expect, it } from "vitest";
-import { latestReasonsByApplication, latestTxIdsByApplication } from "@/lib/domain/applicationEvents";
+import {
+  eventsByApplication,
+  latestReasonsByApplication,
+  latestTxIdsByApplication,
+} from "@/lib/domain/applicationEvents";
 import type { Address, ApplicationEvent, StatusField } from "@/lib/domain/types";
 
 const ACTOR = `0x${"22".repeat(20)}` as Address;
@@ -71,6 +75,46 @@ describe("latestReasonsByApplication", () => {
 
     expect(reasons.get("a1")?.review?.reason).toBe("a1の理由");
     expect(reasons.get("a2")?.review?.reason).toBe("a2の理由");
+  });
+});
+
+describe("eventsByApplication", () => {
+  it("returns nothing for an empty history", () => {
+    expect(eventsByApplication([])).toEqual(new Map());
+  });
+
+  it("keeps every transition, including ones without a reason or tx hash", () => {
+    const history = eventsByApplication([
+      event({ field: "review", toStatus: "approved", createdAt: "2026-08-09T01:00:00Z" }),
+      event({ field: "allowlist", toStatus: "failed", reason: "ガス不足", createdAt: "2026-08-09T02:00:00Z" }),
+      event({ field: "allowlist", toStatus: "added", txId: "0xallow", createdAt: "2026-08-09T03:00:00Z" }),
+    ]);
+
+    // 「1回目はガス不足、2回目は成功」の経緯を追うのが目的なので、
+    // field ごとの最新だけに畳まない(Issue #34)。
+    expect(history.get("a1")).toHaveLength(3);
+  });
+
+  it("orders newest first regardless of the order it receives events in", () => {
+    const oldest = event({ field: "review", toStatus: "approved", createdAt: "2026-08-09T01:00:00Z" });
+    const newest = event({ field: "allowlist", toStatus: "added", createdAt: "2026-08-09T05:00:00Z" });
+
+    for (const input of [[oldest, newest], [newest, oldest]]) {
+      expect(eventsByApplication(input).get("a1")?.map((e) => e.toStatus)).toEqual([
+        "added",
+        "approved",
+      ]);
+    }
+  });
+
+  it("groups by application", () => {
+    const history = eventsByApplication([
+      event({ applicationId: "a1", field: "review", toStatus: "approved" }),
+      event({ applicationId: "a2", field: "review", toStatus: "rejected" }),
+    ]);
+
+    expect(history.get("a1")).toHaveLength(1);
+    expect(history.get("a2")?.[0].toStatus).toBe("rejected");
   });
 });
 
