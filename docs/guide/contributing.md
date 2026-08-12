@@ -107,6 +107,14 @@ git push -u origin <ブランチ名>
 - **秘密情報や個人情報をコミットしない。** `.env.local`、Supabaseのキー、ウォレットの秘密鍵、Safeの認証情報は絶対に含めません
 - コマンドの実行結果を貼るときも、キーが混ざっていないか確認してください
 
+## ライセンスの前提
+
+このリポジトリはソフトウェアと創作物でライセンスを分けています。**コードとドキュメントは [MIT License](https://github.com/henkaku-center/initiation/blob/main/LICENSE)、イラストや音源などの創作物は [CC BY 4.0](https://github.com/henkaku-center/initiation/blob/main/LICENSE-CC-BY-4.0.txt)** です。
+
+Pull Requestは、この区分に沿ったライセンスで提供されたものとして扱います（inbound = outbound）。
+
+自分が権利を持たないコード・文章・創作物を含める場合は、**出典と元のライセンスをPull Requestに書いてください。** 創作物を追加するときの許諾と帰属表示の手順は [CONTRIBUTING.md](https://github.com/henkaku-center/initiation/blob/main/CONTRIBUTING.md) にあります。
+
 ## Next.js に関する変更をするとき
 
 このプロジェクトが使っているNext.jsのバージョンは、学習済みの知識と挙動が異なる場合があります。変更前に、リポジトリの `AGENTS.md` と `node_modules/next/dist/docs/` の該当ガイドを確認してください。

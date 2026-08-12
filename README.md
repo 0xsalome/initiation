@@ -118,6 +118,8 @@ npx tsc --noEmit
 5. 変更理由、検証内容、未解決の判断をPull Requestに書く
 6. UI変更はスクリーンショットまたは手動確認手順を添える
 
+コントリビューションのライセンスとmaintainerの考え方は [CONTRIBUTING.md](CONTRIBUTING.md) にあります。
+
 判断が必要な事項は勝手に仕様化せず、`docs/decisions/` に1決定1ファイルで記録してから実装します。命名規則は [決定事項の読み方](docs/decisions.md) を参照してください。Next.jsの変更を行うときは、リポジトリの `AGENTS.md` と `node_modules/next/dist/docs/` の該当ガイドを確認してください。
 
 ## 現在の制約と次の計画
@@ -126,10 +128,26 @@ npx tsc --noEmit
 - 質問箱は未実装です。まず人だけで質問・回答のループを検証し、その後AIを検討します
 - AIはフェーズ3で回答案と参考情報を作る補助役として導入し、最終回答は人が確認します
 - Vercel / Supabase本番環境へのデプロイは延期中です
-- 本番公開前にプライバシー方針とライセンスを確定してください（現時点でLICENSEファイルは未設定です）
+- 本番公開前にプライバシー方針を確定してください（ライセンスは確定済みです。コードとドキュメントはMIT、創作物はCC BY 4.0）
 
 全体計画は [docs/development-plan.md](docs/development-plan.md)、実装計画は [docs/superpowers/plans/2026-08-06-phase1-initiation-mvp1.md](docs/superpowers/plans/2026-08-06-phase1-initiation-mvp1.md)、決定事項は [docs/decisions.md](docs/decisions.md) から参照できます。
 
 ## ライセンス
 
-コミュニティに公開する前に、コードの利用・改変・再配布条件を決めてLICENSEファイルを追加してください。ライセンスはプロジェクト運営者の判断が必要なため、ここでは未決定のままにしています。
+**ソフトウェアと創作物で分けています。** 著作権者の表記はどちらも `henkaku Community` です。
+
+| 対象 | ライセンス |
+| --- | --- |
+| コード（`app/` `components/` `lib/` `supabase/` `scripts/` `tests/` と設定ファイル） | [MIT License](LICENSE) |
+| ドキュメント（`docs/` と `README.md`・`CONTRIBUTING.md` などのMarkdown） | [MIT License](LICENSE) |
+| 創作物（イラスト・音源など、コードとドキュメント以外） | [CC BY 4.0](LICENSE-CC-BY-4.0.txt) |
+
+MITはソフトウェア向けの文面で、イラストや音源へ適用すると**再利用する人が何をすれば条件を満たすのかを読み取れません。** 創作物をCC BY 4.0にしているのはこのためで、CC BY 4.0では帰属表示がライセンス上の義務になります。
+
+現時点でリポジトリに創作物はありません。追加するときの許諾と表示の手順は [CONTRIBUTING.md](CONTRIBUTING.md) にあります。
+
+第三者から取り込んだ素材は、自前の創作物と同じく**素材の配置ディレクトリの `CREDITS.md` に、元のライセンスを明記して記録します。** 上の表は、そこに別のライセンスが明記されていない素材に適用されます。
+
+Pull Requestは、上の区分に沿って同じライセンスで提供されたものとして扱います（inbound = outbound）。
+
+判断の経緯は [ライセンスの決定](docs/decisions/2026-08-11-license.md) に記録しています。
