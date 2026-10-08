@@ -69,18 +69,19 @@ jobs:
       # リンク切れがあるとVitePressのビルドが失敗するため、これが検証を兼ねる
       - run: npm run docs:build
 
+      # forkではビルド検証のみ行い、Pages未設定でも失敗させない。
       - uses: actions/configure-pages@v6
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && github.repository == 'henkaku-center/initiation'
 
       - uses: actions/upload-pages-artifact@v5
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && github.repository == 'henkaku-center/initiation'
         with:
           path: docs/.vitepress/dist
 
   deploy:
     name: deploy to GitHub Pages
     # Pull Requestではデプロイせず、ビルド検証のみ行う
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' && github.repository == 'henkaku-center/initiation'
     needs: build
     runs-on: ubuntu-latest
     environment:
